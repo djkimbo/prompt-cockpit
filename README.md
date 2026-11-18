@@ -45,10 +45,6 @@ claude plugin install prompt-cockpit --marketplace djkimbo/prompt-cockpit
 
 ## Die Leiste, Stück für Stück
 
-```
-5-Std-Limit ██░░░░░░░░ 15 % Reset 12:30 Uhr | Woche 14 % | HF 1.095     [🎮 GAME G] [🧠 Brain B]
-```
-
 | Teil | Was er dir sagt |
 |---|---|
 | `5-Std-Limit ██░░░░░░░░ 15 %` | Verbrauch im laufenden 5-Stunden-Fenster als Balken aus 10 Kästchen. Ab 70 % wird er gelb, ab 90 % rot. |
@@ -161,10 +157,6 @@ claude plugin install prompt-cockpit --marketplace djkimbo/prompt-cockpit
 `prompt-cockpit` pulls in the three mods `limit-band`, `brain` and `game` by itself. Only want part of it? Install `limit-band`, `brain` or `game` on their own. `game` brings `brain` along, because the GAME button sits next to the Brain button.
 
 ## The bar, piece by piece
-
-```
-5h limit ██░░░░░░░░ 15 % resets 12:30 | Week 14 % | HF 1,095     [🎮 GAME G] [🧠 Brain B]
-```
 
 | Part | What it tells you |
 |---|---|
