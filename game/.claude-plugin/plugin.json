@@ -1,0 +1,8 @@
+{
+  "name": "game",
+  "version": "1.0.0",
+  "description": "Button 🎮 GAME neben 🧠 Brain: öffnet reihum 5 Fußball-Minispiele im Browser. Button 🎮 GAME next to 🧠 Brain: opens 5 football mini games in your browser, one after another.",
+  "author": { "name": "Kemal Duran" },
+  "license": "MIT",
+  "keywords": ["mod", "games", "football", "fun"]
+}

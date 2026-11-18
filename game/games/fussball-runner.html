@@ -1,0 +1,710 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fußball-Runner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: eine schmale Karte, Überschrift und Einleitung, darunter das Spielfeld (Draufsicht, scrollt nach unten). Seit 18.11.2026 Pausenspiel hinter dem GAME-Button statt Wartungsseite. Bewusst nur ein (helles) Erscheinungsbild. */
+:root {
+  --bg: #f2f5f3;
+  --card: #ffffff;
+  --ink: #17251c;
+  --muted: #5b6a61;
+  --line: #e1e7e3;
+  --pitch: #2f8a4a;
+  --pitch-2: #2a7f43;
+  --chalk: #ffffff;
+  --ball-ink: #1b2420;
+  --gold: #f2c230;
+  --lila: #a259e6;
+  --blau: #2f86eb;
+  --ich: #f7f7f2;
+  --ich-hose: #1f5c34;
+  --gegner: #d23c32;
+  --gegner-hose: #f7f7f2;
+  --haut: #e2b38c;
+  --haare: #33251a;
+  --schuh: #15181a;
+  --knopf-hover: #e3efe6;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+html, body { background: var(--bg); color: var(--ink); }
+body {
+  margin: 0;
+  font-family: var(--font);
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card {
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(23, 37, 28, .06), 0 10px 30px rgba(23, 37, 28, .06);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+h1 { font-size: 1.9rem; line-height: 1.15; margin: 0; text-wrap: balance; }
+.lead { font-size: 1.12rem; line-height: 1.55; color: var(--muted); margin: 0; }
+
+.game {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--pitch);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.game canvas { display: block; width: 100%; height: 440px; cursor: pointer; touch-action: none; }
+.game canvas:focus { outline: none; }
+.game canvas:focus-visible { outline: 3px solid var(--chalk); outline-offset: -6px; }
+.hud {
+  position: absolute; inset: 0 0 auto;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: start;
+  padding: 10px 14px;
+  color: var(--chalk);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+}
+.score { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+.meta { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .9; margin-top: 4px; }
+.leben { font-size: 1.15rem; letter-spacing: .12em; padding-top: 4px; }
+.best { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-align: right; opacity: .9; }
+.best b { display: block; font-size: 1.3rem; letter-spacing: 0; }
+[hidden] { display: none !important; }
+.panel {
+  position: absolute; left: 50%; top: 55%;
+  transform: translate(-50%, -50%);
+  width: min(300px, calc(100% - 40px));
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background: rgba(12, 32, 19, .8);
+  color: var(--chalk);
+  text-align: center;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.panel-titel { margin: 0; font-size: 1.35rem; font-weight: 800; line-height: 1.2; text-wrap: balance; }
+.panel.neu .panel-titel { color: var(--gold); }
+.panel-text { margin: 0; font-size: .95rem; font-weight: 600; line-height: 1.4; opacity: .92; }
+.ergebnis { margin: 0; display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
+.ergebnis div { display: flex; justify-content: space-between; gap: 12px; padding-block: 6px; border-bottom: 1px solid rgba(255, 255, 255, .15); }
+.ergebnis dt { font-weight: 600; opacity: .85; }
+.ergebnis dd { margin: 0; font-weight: 800; }
+.knopf {
+  margin-top: 4px;
+  appearance: none; border: 0; border-radius: 999px;
+  padding: 12px 18px;
+  font: inherit; font-size: 1rem; font-weight: 800;
+  background: var(--chalk); color: var(--ich-hose);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.knopf:hover { background: var(--knopf-hover); }
+.knopf:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.lang { display: flex; flex-direction: column; }
+.lang section { border-top: 1px solid var(--line); padding-block: 16px; }
+.lang h2 { font-size: 1.08rem; margin: 0 0 6px; }
+.lang p { margin: 0; color: var(--muted); line-height: 1.55; }
+</style>
+
+<style id="handy">
+/* Handy-Grundlage (18.11.2026), gleich in allen Spielen: kein Doppeltipp-Zoom, kein Kontextmenü beim
+   langen Drücken, kein Zurückfedern der Seite, kompaktere Karte und Spielfläche passend zur Bildschirmhöhe. */
+html { touch-action: manipulation; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+.game, .arena, .brett, canvas { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+@media (max-width: 520px) {
+  body { padding-block: 10px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  .card { padding: 16px 12px; gap: 12px; border-radius: 16px; }
+  h1 { font-size: 1.45rem; }
+  .lead { font-size: .95rem; line-height: 1.45; }
+  .regeln { font-size: .88rem; }
+  .knopf, .wahl { min-height: 44px; }   /* Daumen-Mindestgröße */
+  .game canvas { height: clamp(360px, calc(100svh - 190px), 440px); }
+  .hud { padding: 8px 10px; }
+  .score { font-size: 1.75rem; }
+  .meta { font-size: .6rem; white-space: nowrap; letter-spacing: .04em; }
+  .leben { font-size: .95rem; padding-top: 2px; }
+  .best { font-size: .6rem; }
+  .best b { font-size: 1.05rem; }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .lead, .regeln { display: none; }
+  body { padding-block: 6px; }
+  .card { padding: 10px 12px; gap: 8px; }
+  h1 { font-size: 1.2rem; }
+  .game canvas { height: clamp(260px, calc(100svh - 70px), 440px); }
+}
+</style>
+<script id="handy-scroll">
+// Beim Start auf dem Handy die ganze Spielfläche ins Bild holen
+document.addEventListener('click', function (e) {
+  if (!e.target.closest || !e.target.closest('.panel .knopf, #neu, .panel button')) return;
+  var g = document.querySelector('.game, .arena, .brett');
+  if (!g) return;
+  var r = g.getBoundingClientRect();
+  if (r.top < 0 || r.bottom > window.innerHeight) g.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}, true);
+</script>
+<main class="card">
+  <h1 id="kopf">Kopf frei laufen</h1>
+  <p class="lead" id="lead">Die beste Idee kommt selten, solange man sie anstarrt. Also lauf ihr davon: Bälle sammeln, Verteidigern ausweichen. Wenn du zurückkommst, wartet sie meistens schon an der Seitenlinie.</p>
+
+  <div class="game" id="game">
+    <canvas id="pitch" tabindex="0" aria-label="Minispiel: Bälle sammeln, Gegnern ausweichen"></canvas>
+    <div class="hud">
+      <div>
+        <div class="score" id="score">0</div>
+        <div class="meta" id="meta"></div>
+      </div>
+      <div class="leben" id="leben" aria-label="Leben"></div>
+      <div class="best" id="best"></div>
+    </div>
+    <div class="panel" id="panel" aria-live="polite">
+      <p class="panel-titel" id="panelTitel" hidden></p>
+      <p class="panel-text" id="panelText"></p>
+      <dl class="ergebnis" id="ergebnis" hidden>
+        <div id="zeilePunkte"><dt id="lblPunkte"></dt><dd id="erPunkte"></dd></div>
+        <div id="zeileBaelle"><dt id="lblBaelle"></dt><dd id="erBaelle"></dd></div>
+        <div id="zeileBest"><dt id="lblBest"></dt><dd id="erBest"></dd></div>
+      </dl>
+      <button type="button" class="knopf" id="knopf"></button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // Texte des Spiels je Sprache (Gerätesprache, Rückfall Englisch)
+  var TEXTE = {
+    de: { touch: 'Finger aufs Feld und ziehen: Bälle sammeln, Gegnern ausweichen.', keys: 'Pfeiltasten oder WASD: Bälle sammeln, Gegnern ausweichen.', balls: 'Bälle', best: 'Highscore', points: 'Punkte', level: 'Level', faster: 'schneller!', start: 'Spiel starten', again: 'Nochmal spielen', over: 'Abpfiff!', rec: 'Neuer Highscore!' },
+    en: { touch: 'Drag on the pitch: collect balls, dodge defenders.', keys: 'Arrow keys or WASD: collect balls, dodge defenders.', balls: 'Balls', best: 'High score', points: 'Points', level: 'Level', faster: 'faster!', start: 'Start game', again: 'Play again', over: 'Full time!', rec: 'New high score!' },
+    fr: { touch: 'Fais glisser ton doigt sur le terrain : ramasse les ballons, évite les défenseurs.', keys: 'Flèches ou ZQSD : ramasse les ballons, évite les défenseurs.', balls: 'Ballons', best: 'Meilleur score', points: 'Points', level: 'Niveau', faster: 'plus rapide !', start: 'Lancer la partie', again: 'Rejouer', over: 'Coup de sifflet final !', rec: 'Nouveau meilleur score !' },
+    it: { touch: 'Trascina il dito sul campo: raccogli i palloni, evita i difensori.', keys: 'Frecce o WASD: raccogli i palloni, evita i difensori.', balls: 'Palloni', best: 'Record', points: 'Punti', start: 'Inizia partita', again: 'Gioca ancora', over: 'Fischio finale!', rec: 'Nuovo record!' },
+    es: { touch: 'Desliza el dedo por el campo: recoge balones y esquiva a los defensas.', keys: 'Flechas o WASD: recoge balones y esquiva a los defensas.', balls: 'Balones', best: 'Récord', points: 'Puntos', start: 'Empezar partido', again: 'Jugar otra vez', over: '¡Final del partido!', rec: '¡Nuevo récord!' },
+    pl: { touch: 'Przesuwaj palcem po boisku: zbieraj piłki, omijaj obrońców.', keys: 'Strzałki lub WASD: zbieraj piłki, omijaj obrońców.', balls: 'Piłki', best: 'Rekord', points: 'Punkty', start: 'Rozpocznij grę', again: 'Zagraj ponownie', over: 'Koniec meczu!', rec: 'Nowy rekord!' },
+    tr: { touch: 'Parmağını sahada kaydır: topları topla, defans oyuncularından kaç.', keys: 'Ok tuşları veya WASD: topları topla, defans oyuncularından kaç.', balls: 'Toplar', best: 'Rekor', points: 'Puan', start: 'Oyunu başlat', again: 'Tekrar oyna', over: 'Maç bitti!', rec: 'Yeni rekor!' }
+  };
+  var sprache = ((navigator.languages && navigator.languages[0]) || navigator.language || 'de').slice(0, 2).toLowerCase();
+  var T = TEXTE[sprache] || TEXTE.en;
+  if (sprache !== 'de') {
+    document.getElementById('kopf').textContent = 'Run your head clear';
+    document.getElementById('lead').textContent = 'Good ideas rarely show up while you stare at them. So run: grab the balls, dodge the defenders. By the time you are back, the idea is usually waiting on the touchline.';
+  }
+  var FORMAT = null;
+  try { FORMAT = new Intl.NumberFormat(sprache); } catch (e) { FORMAT = null; }
+  function zahl(n) { n = Math.floor(n); return FORMAT ? FORMAT.format(n) : String(n); }
+  var touch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
+  var cv = document.getElementById('pitch');
+  var ctx = cv.getContext('2d');
+  var elScore = document.getElementById('score');
+  var elMeta = document.getElementById('meta');
+  var elLeben = document.getElementById('leben');
+  var elBest = document.getElementById('best');
+  var elPanel = document.getElementById('panel');
+  var elTitel = document.getElementById('panelTitel');
+  var elText = document.getElementById('panelText');
+  var elErgebnis = document.getElementById('ergebnis');
+  var elErPunkte = document.getElementById('erPunkte');
+  var elErBaelle = document.getElementById('erBaelle');
+  var elErBest = document.getElementById('erBest');
+  var elKnopf = document.getElementById('knopf');
+  document.getElementById('lblPunkte').textContent = T.points;
+  document.getElementById('lblBaelle').textContent = T.balls;
+  document.getElementById('lblBest').textContent = T.best;
+
+  var css = getComputedStyle(document.documentElement);
+  function farbe(name) { return css.getPropertyValue(name).trim(); }
+  var C = {
+    pitch: farbe('--pitch'), pitch2: farbe('--pitch-2'), chalk: farbe('--chalk'), ink: farbe('--ball-ink'), gold: farbe('--gold'), lila: farbe('--lila'), blau: farbe('--blau'),
+    ich: farbe('--ich'), ichHose: farbe('--ich-hose'), gegner: farbe('--gegner'), gegnerHose: farbe('--gegner-hose'),
+    haut: farbe('--haut'), haare: farbe('--haare'), schuh: farbe('--schuh')
+  };
+  var FONT = farbe('--font');
+
+  // eigener Highscore, nur im localStorage dieses Browsers
+  var SPEICHER = 'prompt_cockpit_runner_highscore';
+  var rekord = 0;
+  try { rekord = parseInt(localStorage.getItem(SPEICHER), 10) || 0; } catch (e) { rekord = 0; }
+
+  var W = 0, H = 0, dpr = 1, RAND = 12, BR = 9;
+  var ballBild = null, goldBild = null, lilaBild = null, blauBild = null;
+  var ich = { x: 0, y: 0, r: 12 };
+  var S = null, gegner = [], kugeln = [], texte = [], tasten = {}, zeiger = null;
+  // Alle 100.000 Punkte ein Leben zurück, nur wenn schon eins verloren ist: nie mehr als 3.
+  // Wer bei 100.000 noch alle 3 hat, bekommt nichts; die nächste Chance ist bei 200.000.
+  var EXTRA_LEBEN = 100000, MAX_LEBEN = 3;
+  // Lila Ball: Punkte ×2, blauer Ball: Punkte ×3, je 10 Sekunden
+  var MAL_DAUER = 10;
+  // Level = je 100.000 Punkte (Level 1 ab 0). Ab Level 7 (600.000 Punkte) läuft alles 15 % schneller,
+  // Höchsttempo 460 → 529 px/s.
+  var LEVEL_PUNKTE = 100000, SCHNELL_AB = 7, SCHNELL_FAKTOR = 1.15;
+  function levelVon(p) { return Math.floor(p / LEVEL_PUNKTE) + 1; }
+  var timerG = 0, timerB = 0, endeSeit = 0, letztePunkte = -1;
+
+  function klemm(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function zufall(a, b) { return a + Math.random() * (b - a); }
+
+  // Ball als vorgerendertes Bild (Fünfecke auf weißem oder goldenem Grund)
+  function ballSprite(R, grund) {
+    var s = Math.ceil((R * 2 + 4) * dpr);
+    var c2 = document.createElement('canvas');
+    c2.width = c2.height = s;
+    var c = c2.getContext('2d');
+    c.scale(dpr, dpr);
+    var cx = R + 2, cy = R + 2;
+    c.save();
+    c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2);
+    c.fillStyle = grund; c.fill(); c.clip();
+    c.fillStyle = C.ink; c.strokeStyle = C.ink; c.lineWidth = R * 0.08; c.lineCap = 'round';
+    function fuenfeck(x, y, rad, rot) {
+      c.beginPath();
+      for (var i = 0; i < 5; i++) {
+        var a = rot + i * 2 * Math.PI / 5;
+        c.lineTo(x + Math.cos(a) * rad, y + Math.sin(a) * rad);
+      }
+      c.closePath(); c.fill();
+    }
+    var rot = -Math.PI / 2;
+    fuenfeck(cx, cy, R * 0.36, rot);
+    for (var i = 0; i < 5; i++) {
+      var a = rot + i * 2 * Math.PI / 5;
+      c.beginPath();
+      c.moveTo(cx + Math.cos(a) * R * 0.36, cy + Math.sin(a) * R * 0.36);
+      c.lineTo(cx + Math.cos(a) * R * 0.7, cy + Math.sin(a) * R * 0.7);
+      c.stroke();
+      fuenfeck(cx + Math.cos(a) * R * 1.04, cy + Math.sin(a) * R * 1.04, R * 0.36, a + Math.PI);
+    }
+    var g = c.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+    g.addColorStop(0, 'rgba(255,255,255,0)');
+    g.addColorStop(1, 'rgba(0,0,0,0.25)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, R * 2 + 4, R * 2 + 4);
+    c.restore();
+    return c2;
+  }
+
+  function grenzen() {
+    ich.x = klemm(ich.x, RAND + ich.r, W - RAND - ich.r);
+    ich.y = klemm(ich.y, H * 0.3, H - ich.r - 12);
+  }
+
+  function groesse() {
+    var r = cv.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 3);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ballBild = ballSprite(BR, C.chalk);
+    goldBild = ballSprite(BR, C.gold);
+    lilaBild = ballSprite(BR, C.lila);
+    blauBild = ballSprite(BR, C.blau);
+    if (S && S.zustand === 'bereit') { ich.x = W / 2; ich.y = H - 80; }
+    grenzen();
+  }
+
+  function zeile(id, sichtbar) { document.getElementById(id).hidden = !sichtbar; }
+
+  // Tafel vor dem Anpfiff: Steuerung, ggf. eigener Highscore, Start-Button
+  function panelBereit() {
+    elPanel.classList.remove('neu');
+    elTitel.hidden = true;
+    elText.textContent = touch ? T.touch : T.keys;
+    elText.hidden = false;
+    zeile('zeilePunkte', false);
+    zeile('zeileBaelle', false);
+    zeile('zeileBest', true);
+    elErBest.textContent = zahl(rekord);
+    elErgebnis.hidden = rekord <= 0;
+    elKnopf.textContent = T.start;
+    elPanel.hidden = false;
+  }
+
+  // Tafel nach dem Abpfiff: Ergebnis und Highscore, neue Runde nur per Button
+  function panelEnde(neu) {
+    elPanel.classList.toggle('neu', neu);
+    elTitel.textContent = neu ? T.rec : T.over;
+    elTitel.hidden = false;
+    elText.hidden = true;
+    zeile('zeilePunkte', true);
+    zeile('zeileBaelle', true);
+    zeile('zeileBest', true);
+    elErPunkte.textContent = zahl(S.punkte);
+    elErBaelle.textContent = zahl(S.baelle);
+    elErBest.textContent = zahl(rekord);
+    elErgebnis.hidden = false;
+    elKnopf.textContent = T.again;
+    elPanel.hidden = false;
+    try { elKnopf.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+  }
+
+  function hud() {
+    elScore.textContent = zahl(S.punkte);
+    letztePunkte = Math.floor(S.punkte);
+    elLeben.textContent = '♥'.repeat(Math.max(0, S.leben)) + '♡'.repeat(Math.max(0, MAX_LEBEN - S.leben));
+    elBest.textContent = '';
+    elBest.appendChild(document.createTextNode(T.best));
+    var b = document.createElement('b');
+    b.textContent = zahl(Math.max(rekord, S.punkte));
+    elBest.appendChild(b);
+    elMeta.textContent = T.level + ' ' + S.level + ' · ' + T.balls + ' · ' + S.baelle;
+  }
+  function punkteAnzeige() {
+    var p = Math.floor(S.punkte);
+    if (p === letztePunkte) return;
+    letztePunkte = p;
+    elScore.textContent = zahl(p);
+    if (p > rekord && elBest.lastChild) elBest.lastChild.textContent = zahl(p);
+  }
+
+  function neuerZustand(zustand, tempo) {
+    S = { zustand: zustand, baelle: 0, punkte: 0, leben: MAX_LEBEN, naechstesLeben: EXTRA_LEBEN, mal: 1, malZeit: 0, level: 1, tempo: tempo, zeit: 0, scroll: S ? S.scroll : 0, unverw: 0, wackeln: 0 };
+    gegner = []; kugeln = []; texte = [];
+    timerG = 1.0; timerB = 0.3; letztePunkte = -1;
+    ich.x = W / 2; ich.y = H - 80;
+  }
+
+  function bereit() {
+    neuerZustand('bereit', 70);
+    panelBereit();
+    hud();
+  }
+
+  function start() {
+    neuerZustand('spiel', 180);
+    elPanel.hidden = true;
+    try { cv.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+    hud();
+  }
+
+  function abpfiff() {
+    S.zustand = 'ende';
+    endeSeit = performance.now();
+    tasten = {};
+    S.punkte = Math.floor(S.punkte);
+    var neu = S.punkte > rekord;
+    if (neu) {
+      rekord = S.punkte;
+      try { localStorage.setItem(SPEICHER, String(rekord)); } catch (e) { /* ohne Speicher weiterspielen */ }
+    }
+    zeiger = null;
+    hud();
+    panelEnde(neu);
+  }
+
+  function extraLeben() {
+    var dazu = false;
+    while (S.punkte >= S.naechstesLeben) {
+      S.naechstesLeben += EXTRA_LEBEN;
+      if (S.leben < MAX_LEBEN) { S.leben++; dazu = true; }
+    }
+    if (!dazu) return;
+    texte.push({ x: ich.x, y: ich.y - 30, t: 0, txt: '+1 ♥', gold: true, d: 1.4 });
+    if (navigator.vibrate) { try { navigator.vibrate([30, 40, 30]); } catch (e) { /* egal */ } }
+    hud();
+  }
+
+  function levelPruefen() {
+    var l = levelVon(S.punkte);
+    if (l <= S.level) return;
+    S.level = l;
+    texte.push({ x: W / 2, y: H * 0.45, t: 0, txt: T.level + ' ' + l + (l === SCHNELL_AB ? ' · ' + T.faster : ''), gold: true, d: 1.6 });
+    hud();
+  }
+
+  function treffer() {
+    S.leben--;
+    S.unverw = 1.4;
+    S.wackeln = 0.25;
+    if (navigator.vibrate) { try { navigator.vibrate(50); } catch (e) { /* egal */ } }
+    hud();
+    if (S.leben <= 0) abpfiff();
+  }
+
+  function neuerGegner() {
+    // Ab 10 s manchmal zwei Gegner Schulter an Schulter: zu eng zum Durchlaufen, also außen vorbei
+    if (S.zeit >= 10 && Math.random() < Math.min(0.35, 0.12 + S.zeit * 0.003)) {
+      var abstand = zufall(30, 37);
+      var x1 = zufall(RAND + 14, W - RAND - 14 - abstand);
+      var vp = zufall(30, 70 + Math.min(S.zeit, 120) * 0.8);
+      var lp = Math.random() * Math.PI * 2;
+      gegner.push({ x: x1, bx: x1, y: -24, t: 0, typ: 'gerade', v: vp, ph: 0, lauf: lp });
+      gegner.push({ x: x1 + abstand, bx: x1 + abstand, y: -24, t: 0, typ: 'gerade', v: vp, ph: 0, lauf: lp + Math.PI });
+      return;
+    }
+    var x = zufall(RAND + 14, W - RAND - 14);
+    var w = Math.random();
+    // Schwierigkeit steigt langsam: erst nur gerade Läufer, ab 15 s Zickzack, ab 30 s auch Verfolger
+    var typ = 'gerade';
+    if (S.zeit >= 30) typ = w < 0.55 ? 'gerade' : (w < 0.8 ? 'zickzack' : 'verfolger');
+    else if (S.zeit >= 15) typ = w < 0.7 ? 'gerade' : 'zickzack';
+    gegner.push({
+      x: x, bx: x, y: -24, t: 0, typ: typ,
+      v: zufall(30, 80 + Math.min(S.zeit, 120)),
+      ph: Math.random() * Math.PI * 2,
+      lauf: Math.random() * Math.PI * 2
+    });
+  }
+
+  function neueKugeln() {
+    var x = zufall(RAND + BR + 6, W - RAND - BR - 6);
+    if (Math.random() < 0.25) {
+      for (var j = 0; j < 4; j++) kugeln.push({ x: x, y: -14 - j * 30, gold: false, a: Math.random() * 6 });
+    } else {
+      // einzelner Ball: 3 % blau (×3), 5 % lila (×2), 7 % gold (+5.000), sonst weiß
+      var w = Math.random();
+      // Kein neuer Faktor-Ball, solange ×2/×3 läuft oder schon einer auf dem Feld liegt
+      var malErlaubt = S.malZeit <= 0 && !kugeln.some(function (k) { return k.mal; });
+      var mal = !malErlaubt ? 0 : (w < 0.03 ? 3 : (w < 0.08 ? 2 : 0));
+      kugeln.push({ x: x, y: -14, gold: !mal && w < 0.15, mal: mal, a: Math.random() * 6 });
+    }
+  }
+
+  function bewegen(dt, aktiv) {
+    for (var i = gegner.length - 1; i >= 0; i--) {
+      var g = gegner[i];
+      g.t += dt;
+      g.y += (S.tempo + g.v) * dt;
+      if (g.typ === 'zickzack') {
+        g.x = g.bx + Math.sin(g.ph + g.t * 2.6) * 42;
+      } else if (g.typ === 'verfolger' && g.y < ich.y - 50) {
+        g.x += klemm((ich.x - g.x) * 1.5, -75, 75) * dt;
+      }
+      g.x = klemm(g.x, RAND + 12, W - RAND - 12);
+      g.lauf += (S.tempo + g.v) * dt / 9;
+      if (g.y > H + 40) { gegner.splice(i, 1); continue; }
+      if (aktiv && S.unverw <= 0 && Math.hypot(g.x - ich.x, g.y - ich.y) < 20) treffer();
+    }
+    for (var k = kugeln.length - 1; k >= 0; k--) {
+      var b = kugeln[k];
+      b.y += S.tempo * dt;
+      b.a += dt * 3;
+      if (b.y > H + 20) { kugeln.splice(k, 1); continue; }
+      if (aktiv && S.zustand === 'spiel' && Math.hypot(b.x - ich.x, b.y - ich.y) < ich.r + BR + 2) {
+        if (b.mal) {
+          // Der stärkere Faktor gewinnt, jeder Treffer startet die 10 Sekunden neu.
+          S.mal = Math.max(S.malZeit > 0 ? S.mal : 1, b.mal);
+          S.malZeit = MAL_DAUER;
+          for (var m = 0; m < kugeln.length; m++) if (kugeln[m] !== b) kugeln[m].mal = 0;
+        }
+        var bonus = (b.gold ? 5000 : 1000) * S.mal;
+        S.baelle += 1;
+        S.punkte += bonus;
+        texte.push(b.mal
+          ? { x: b.x, y: b.y - 6, t: 0, txt: '×' + b.mal + ' für ' + MAL_DAUER + ' s', farbe: b.mal === 3 ? C.blau : C.lila, d: 1.2 }
+          : { x: b.x, y: b.y - 6, t: 0, txt: '+' + zahl(bonus), gold: b.gold });
+        kugeln.splice(k, 1);
+        hud();
+        extraLeben();
+        levelPruefen();
+      }
+    }
+    for (var n = texte.length - 1; n >= 0; n--) { texte[n].t += dt; if (texte[n].t > (texte[n].d || 0.6)) texte.splice(n, 1); }
+  }
+
+  function schritt(dt) {
+    S.scroll += S.tempo * dt;
+    if (S.zustand !== 'spiel') {
+      if (S.zustand === 'ende') S.tempo = Math.max(0, S.tempo - 400 * dt);
+      S.wackeln = Math.max(0, S.wackeln - dt);
+      bewegen(dt, false);
+      return;
+    }
+    S.zeit += dt;
+    // Tempo steigt langsam: 170 px/s zum Start, Höchsttempo nach rund 100 s
+    S.tempo = Math.min(460, 170 + S.zeit * 3) * (S.level >= SCHNELL_AB ? SCHNELL_FAKTOR : 1);
+    if (S.malZeit > 0) {
+      S.malZeit -= dt;
+      if (S.malZeit <= 0) { S.malZeit = 0; S.mal = 1; }
+    }
+    S.punkte += dt * 1000 * S.mal;
+    punkteAnzeige();
+    extraLeben();
+    levelPruefen();
+
+    var dx = (tasten.r ? 1 : 0) - (tasten.l ? 1 : 0);
+    var dy = (tasten.u ? 1 : 0) - (tasten.o ? 1 : 0);
+    if (dx || dy) {
+      var n = Math.hypot(dx, dy);
+      ich.x += dx / n * 270 * dt;
+      ich.y += dy / n * 270 * dt;
+      grenzen();
+    }
+
+    timerG -= dt;
+    if (timerG <= 0) {
+      neuerGegner();
+      timerG = Math.max(0.3, 1.1 - S.zeit * 0.008) * zufall(0.7, 1.3);
+    }
+    timerB -= dt;
+    if (timerB <= 0) {
+      neueKugeln();
+      timerB = zufall(0.55, 1.05);
+    }
+    S.unverw = Math.max(0, S.unverw - dt);
+    S.wackeln = Math.max(0, S.wackeln - dt);
+    bewegen(dt, true);
+  }
+
+  // Zeichnen
+  function oval(x, y, rx, ry, f) {
+    ctx.fillStyle = f;
+    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function feld() {
+    var ST = 48;
+    var off = S.scroll % ST;
+    for (var y = off - ST; y < H; y += ST) {
+      var k = Math.round((y - S.scroll) / ST);
+      ctx.fillStyle = ((k % 2) + 2) % 2 === 0 ? C.pitch : C.pitch2;
+      ctx.fillRect(-8, y, W + 16, ST + 1);
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(RAND / 2, -10); ctx.lineTo(RAND / 2, H + 10);
+    ctx.moveTo(W - RAND / 2, -10); ctx.lineTo(W - RAND / 2, H + 10);
+    ctx.stroke();
+    // Mittellinie mit Anstoßkreis, alle 1200 px
+    var P = 1200;
+    for (var my = (S.scroll % P) - P; my < H + 80; my += P) {
+      if (my < -80) continue;
+      ctx.beginPath();
+      ctx.moveTo(RAND / 2, my); ctx.lineTo(W - RAND / 2, my);
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(W / 2, my, 52, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(W / 2, my, 3, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function figur(x, y, trikot, hose, gedreht, phase, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.globalAlpha = alpha;
+    oval(2, 5, 14, 9, 'rgba(0,0,0,0.18)');
+    if (gedreht) ctx.rotate(Math.PI);
+    var s = Math.sin(phase);
+    oval(-5, s * 9, 3, 4.8, C.schuh);
+    oval(5, -s * 9, 3, 4.8, C.schuh);
+    oval(-5, s * 4, 3.8, 4.6, hose);
+    oval(5, -s * 4, 3.8, 4.6, hose);
+    oval(-12.5, -s * 5, 3, 3.2, C.haut);
+    oval(12.5, s * 5, 3, 3.2, C.haut);
+    oval(0, 0, 12, 7, trikot);
+    oval(0, -1, 5.4, 5.4, C.haare);
+    ctx.restore();
+  }
+
+  function zeichnen() {
+    ctx.save();
+    if (S.wackeln > 0) ctx.translate(zufall(-3, 3), zufall(-3, 3));
+    feld();
+
+    for (var k = 0; k < kugeln.length; k++) {
+      var b = kugeln[k];
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      ctx.rotate(b.a);
+      ctx.drawImage(b.mal === 3 ? blauBild : b.mal === 2 ? lilaBild : b.gold ? goldBild : ballBild, -(BR + 2), -(BR + 2), (BR + 2) * 2, (BR + 2) * 2);
+      ctx.restore();
+    }
+    for (var i = 0; i < gegner.length; i++) {
+      var g = gegner[i];
+      figur(g.x, g.y, C.gegner, C.gegnerHose, true, g.lauf, 1);
+    }
+    var blinken = S.unverw > 0 && Math.floor(S.unverw * 12) % 2 === 0;
+    figur(ich.x, ich.y, C.ich, C.ichHose, false, S.scroll / 9, blinken ? 0.35 : 1);
+
+    ctx.textAlign = 'center';
+    ctx.font = '800 16px ' + FONT;
+    for (var n = 0; n < texte.length; n++) {
+      var t = texte[n];
+      ctx.globalAlpha = 1 - t.t / (t.d || 0.6);
+      ctx.fillStyle = t.farbe || (t.gold ? C.gold : C.chalk);
+      ctx.fillText(t.txt, t.x, t.y - t.t * 36);
+    }
+    ctx.globalAlpha = 1;
+
+    // aktiver Faktor: Plakette oben mittig mit ablaufendem Balken
+    if (S.malZeit > 0) {
+      var pw = 92, ph = 26, px = W / 2 - pw / 2, py = 64;
+      ctx.fillStyle = S.mal === 3 ? C.blau : C.lila;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 13); else ctx.rect(px, py, pw, ph);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillRect(px + 10, py + ph - 5, (pw - 20) * (S.malZeit / MAL_DAUER), 2);
+      ctx.fillStyle = C.chalk;
+      ctx.font = '800 14px ' + FONT;
+      ctx.fillText('×' + S.mal + '  ' + Math.ceil(S.malZeit) + ' s', W / 2, py + 17);
+    }
+    ctx.restore();
+  }
+
+  var zuletzt = performance.now();
+  function loop(jetzt) {
+    var dt = Math.min((jetzt - zuletzt) / 1000, 1 / 30);
+    zuletzt = jetzt;
+    schritt(dt);
+    zeichnen();
+    requestAnimationFrame(loop);
+  }
+
+  // Start und neue Runde nur über den Button
+  elKnopf.addEventListener('click', function () {
+    if (S.zustand !== 'spiel') start();
+  });
+
+  // Finger oder Maus: Spieler folgt der Zugbewegung
+  cv.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    if (S.zustand !== 'spiel') return;
+    zeiger = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    try { cv.setPointerCapture(e.pointerId); } catch (err) { /* egal */ }
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!zeiger || e.pointerId !== zeiger.id || S.zustand !== 'spiel') return;
+    ich.x += (e.clientX - zeiger.x) * 1.25;
+    ich.y += (e.clientY - zeiger.y) * 1.25;
+    zeiger.x = e.clientX; zeiger.y = e.clientY;
+    grenzen();
+  });
+  function loslassen(e) { if (zeiger && e.pointerId === zeiger.id) zeiger = null; }
+  cv.addEventListener('pointerup', loslassen);
+  cv.addEventListener('pointercancel', loslassen);
+
+  // Tastatur: physische Tastenposition (e.code), damit WASD auch auf AZERTY als ZQSD passt
+  var TASTEN = { ArrowUp: 'o', KeyW: 'o', ArrowDown: 'u', KeyS: 'u', ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r' };
+  window.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var richtung = TASTEN[e.code];
+    if (!richtung || S.zustand !== 'spiel') return;
+    e.preventDefault();
+    tasten[richtung] = true;
+  });
+  window.addEventListener('keyup', function (e) {
+    var richtung = TASTEN[e.code];
+    if (richtung) tasten[richtung] = false;
+  });
+  window.addEventListener('blur', function () { tasten = {}; zeiger = null; });
+  document.addEventListener('visibilitychange', function () { zuletzt = performance.now(); tasten = {}; });
+  window.addEventListener('resize', groesse);
+
+  groesse();
+  bereit();
+  requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>

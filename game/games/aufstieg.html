@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Aufstieg</title>
+<style>
+/* Aufstieg: Schiebe-Puzzle, zwei gleiche Vereine steigen zusammen eine Liga auf.
+   Gleiche Karte und Farben wie Fußball-Runner und Elfmeter-Duell, eine Datei, keine Netzaufrufe. */
+:root {
+  --bg: #f2f5f3;
+  --card: #ffffff;
+  --ink: #17251c;
+  --muted: #5b6a61;
+  --line: #e1e7e3;
+  --pitch: #2f8a4a;
+  --brett: #23703b;
+  --zelle: rgba(255, 255, 255, .13);
+  --chalk: #ffffff;
+  --gold: #f2c230;
+  --ich-hose: #1f5c34;
+  --knopf-hover: #e3efe6;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); }
+body {
+  margin: 0;
+  font-family: var(--font);
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card {
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(23, 37, 28, .06), 0 10px 30px rgba(23, 37, 28, .06);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+h1 { font-size: 1.9rem; line-height: 1.15; margin: 0; }
+.lead { font-size: 1.08rem; line-height: 1.5; color: var(--muted); margin: 0; }
+
+.leiste { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+.kasten {
+  flex: 1 1 90px;
+  background: var(--pitch); color: var(--chalk);
+  border-radius: 12px; padding: 8px 12px;
+  font-variant-numeric: tabular-nums;
+}
+.kasten small { display: block; font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+.kasten b { display: block; font-size: 1.35rem; line-height: 1.2; }
+.knopf {
+  appearance: none; border: 0; border-radius: 12px;
+  padding: 8px 14px;
+  font: inherit; font-size: .92rem; font-weight: 800;
+  background: var(--line); color: var(--ich-hose);
+  cursor: pointer; touch-action: manipulation;
+}
+.knopf:hover:not(:disabled) { background: var(--knopf-hover); }
+.knopf:disabled { opacity: .45; cursor: default; }
+.knopf:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.brett {
+  position: relative;
+  width: 100%;
+  max-width: 470px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+  background: var(--brett);
+  border-radius: 14px;
+  touch-action: none;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.brett:focus-visible { box-shadow: 0 0 0 3px var(--gold); }
+.zelle, .stein {
+  position: absolute; left: 0; top: 0;
+  border-radius: 10px;
+}
+.zelle { background: var(--zelle); }
+.stein {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  font-weight: 800;
+  line-height: 1.1;
+  padding: 4px;
+  transition: transform 120ms cubic-bezier(.25, .8, .25, 1);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .12);
+  overflow: hidden;
+}
+.stein.glanz { box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .12), 0 0 16px var(--glow, #f2c230); }
+.stein.glanz::after {
+  content: ""; position: absolute; inset: -40%;
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, .45) 50%, transparent 60%);
+  animation: schimmer 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+.stein .name { font-size: var(--fs, 15px); overflow-wrap: normal; hyphens: manual; }
+.stein .stufe { font-size: calc(var(--fs, 15px) * .7); font-weight: 700; opacity: .7; margin-top: 3px; }
+.stein .icon { font-size: calc(var(--fs, 15px) * 1.5); line-height: 1; margin-bottom: 3px; }
+.stein.neu { animation: auf 220ms cubic-bezier(.3, 1.5, .5, 1) both; }
+.stein.plopp { animation: plopp 260ms cubic-bezier(.3, 1.6, .5, 1); z-index: 2; }
+.stein.oben { z-index: 3; }
+@keyframes auf { 0% { opacity: 0; scale: .2; } 100% { opacity: 1; scale: 1; } }
+@keyframes plopp { 0% { scale: 1; filter: brightness(1); } 35% { scale: 1.24; filter: brightness(1.35); } 100% { scale: 1; filter: brightness(1); } }
+@keyframes schimmer { 0%, 55% { translate: -60% 0; } 100% { translate: 60% 0; } }
+
+/* Effekte über dem Brett: Ring, Funken, Konfetti, Banner */
+.ring, .funke, .konfetti, .banner { position: absolute; pointer-events: none; z-index: 4; }
+.ring { border: 3px solid var(--farbe, #f2c230); border-radius: 12px; animation: ring 480ms ease-out forwards; }
+@keyframes ring { from { scale: .7; opacity: .95; } to { scale: 1.55; opacity: 0; } }
+.funke { left: 0; top: 0; border-radius: 50%; animation: funke var(--dauer, 700ms) cubic-bezier(.2, .7, .3, 1) forwards; }
+@keyframes funke {
+  from { transform: translate(var(--x0), var(--y0)) scale(1); opacity: 1; }
+  to { transform: translate(var(--x1), var(--y1)) scale(.2); opacity: 0; }
+}
+.konfetti { left: 0; top: 0; width: 7px; height: 11px; border-radius: 2px; animation: konfetti var(--dauer, 1500ms) cubic-bezier(.25, .6, .4, 1) var(--verz, 0ms) both; }
+@keyframes konfetti {
+  from { transform: translate(var(--x0), var(--y0)) rotate(0deg); opacity: 1; }
+  85% { opacity: 1; }
+  to { transform: translate(var(--x1), var(--y1)) rotate(var(--dreh)); opacity: 0; }
+}
+.banner {
+  left: 50%; top: 50%;
+  translate: -50% -50%;
+  width: max-content; max-width: 88%;
+  padding: 10px 18px; border-radius: 14px;
+  background: rgba(12, 32, 19, .9); color: var(--chalk);
+  font-weight: 900; font-size: 1.25rem; text-align: center; line-height: 1.25;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  animation: banner 1500ms cubic-bezier(.3, 1.4, .5, 1) forwards;
+}
+.banner small { display: block; font-size: .8rem; font-weight: 800; color: var(--gold); margin-top: 2px; }
+.banner.klein { font-size: 1.05rem; background: var(--gold); color: #17251c; padding: 7px 14px; animation-duration: 1000ms; }
+.banner.gold { color: var(--gold); }
+@keyframes banner {
+  0% { scale: .5; opacity: 0; }
+  14% { scale: 1.08; opacity: 1; }
+  24% { scale: 1; }
+  78% { opacity: 1; translate: -50% -50%; }
+  100% { opacity: 0; translate: -50% -80%; }
+}
+.plus {
+  position: absolute; right: 10px; top: 6px;
+  font-weight: 900; font-size: 1rem; color: var(--gold);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .3);
+  pointer-events: none;
+  animation: plus 850ms ease-out forwards;
+}
+@keyframes plus { from { opacity: 1; translate: 0 6px; } to { opacity: 0; translate: 0 -26px; } }
+.kasten { position: relative; }
+.kasten.puls { animation: puls 260ms ease-out; }
+@keyframes puls { 40% { scale: 1.06; } }
+.brett.wackeln { animation: wackeln 420ms ease-in-out; }
+@keyframes wackeln { 15%, 55% { translate: -7px 0; } 35%, 75% { translate: 7px 0; } }
+.brett.stoss { animation: stoss 180ms ease-out; }
+@keyframes stoss { 40% { translate: var(--sx) var(--sy); } }
+.brett.rueck { animation: rueck 420ms ease-in-out; }
+@keyframes rueck { 0% { filter: none; } 35% { filter: blur(2px) saturate(.2) brightness(1.3); } 100% { filter: none; } }
+.panel:not([hidden]) { animation: panelAuf 280ms cubic-bezier(.3, 1.4, .5, 1); }
+@keyframes panelAuf { from { opacity: 0; transform: translate(-50%, -44%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .stein { transition: none; }
+  .stein.neu, .stein.plopp, .stein.glanz::after, .ring, .funke, .konfetti, .brett.wackeln, .brett.stoss, .brett.rueck, .panel:not([hidden]), .kasten.puls { animation: none; }
+  .funke, .konfetti, .ring { display: none; }
+}
+
+.panel {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(300px, calc(100% - 40px));
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background: rgba(12, 32, 19, .88);
+  color: var(--chalk);
+  text-align: center;
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 5;
+}
+.panel[hidden] { display: none; }
+.panel-titel { margin: 0; font-size: 1.35rem; font-weight: 800; }
+.panel.neu .panel-titel { color: var(--gold); }
+.panel-text { margin: 0; font-size: .95rem; font-weight: 600; line-height: 1.4; opacity: .93; }
+.panel .knopf { background: var(--chalk); border-radius: 999px; padding: 12px 18px; font-size: 1rem; }
+.panel .knopf.zweit { background: transparent; color: var(--chalk); border: 2px solid rgba(255,255,255,.5); }
+.regeln { margin: 0; padding-left: 1.1em; color: var(--muted); line-height: 1.55; font-size: .95rem; }
+.meldung { min-height: 1.4em; margin: -8px 0 0; text-align: center; font-weight: 800; color: var(--pitch); font-size: .95rem; }
+</style>
+</head>
+<body>
+<style id="handy">
+/* Handy-Grundlage (18.11.2026), gleich in allen Spielen: kein Doppeltipp-Zoom, kein Kontextmenü beim
+   langen Drücken, kein Zurückfedern der Seite, kompaktere Karte und Spielfläche passend zur Bildschirmhöhe. */
+html { touch-action: manipulation; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+.game, .arena, .brett, canvas { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+@media (max-width: 520px) {
+  body { padding-block: 10px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  .card { padding: 16px 12px; gap: 12px; border-radius: 16px; }
+  h1 { font-size: 1.45rem; }
+  .lead { font-size: .95rem; line-height: 1.45; }
+  .regeln { font-size: .88rem; }
+  .knopf, .wahl { min-height: 44px; }   /* Daumen-Mindestgröße */
+  .game canvas { height: clamp(360px, calc(100svh - 190px), 480px); }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .lead, .regeln { display: none; }
+  body { padding-block: 6px; }
+  .card { padding: 10px 12px; gap: 8px; }
+  h1 { font-size: 1.2rem; }
+  .leiste { gap: 6px; }
+  .kasten { padding: 4px 10px; }
+  .kasten b { font-size: 1.05rem; }
+  .brett { max-width: calc(100svh - 100px); }
+  .meldung { display: none; }
+  .game canvas { height: clamp(260px, calc(100svh - 70px), 480px); }
+}
+</style>
+<script id="handy-scroll">
+// Beim Start auf dem Handy die ganze Spielfläche ins Bild holen
+document.addEventListener('click', function (e) {
+  if (!e.target.closest || !e.target.closest('.panel .knopf, #neu, .panel button')) return;
+  var g = document.querySelector('.game, .arena, .brett');
+  if (!g) return;
+  var r = g.getBoundingClientRect();
+  if (r.top < 0 || r.bottom > window.innerHeight) g.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}, true);
+</script>
+<main class="card">
+  <h1 id="titel">Aufstieg</h1>
+  <p class="lead" id="lead"></p>
+
+  <div class="leiste">
+    <div class="kasten"><small id="lblPunkte"></small><b id="punkte">0</b></div>
+    <div class="kasten"><small id="lblBest"></small><b id="best">0</b></div>
+    <button type="button" class="knopf" id="var"></button>
+    <button type="button" class="knopf" id="neu"></button>
+  </div>
+
+  <div class="brett" id="brett" tabindex="0" aria-label="Spielfeld 4 × 4">
+    <div class="panel" id="panel" aria-live="polite" hidden>
+      <p class="panel-titel" id="panelTitel"></p>
+      <p class="panel-text" id="panelText"></p>
+      <button type="button" class="knopf" id="panelKnopf"></button>
+      <button type="button" class="knopf zweit" id="panelZweit" hidden></button>
+    </div>
+  </div>
+  <p class="meldung" id="meldung" aria-live="polite"></p>
+
+  <ul class="regeln" id="regeln"></ul>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Texte (Gerätesprache, Rückfall Englisch) ─────────────────────────────
+  var TEXTE = {
+    de: {
+      lead: 'Schieb zwei gleiche Vereine zusammen und sie steigen eine Liga auf. Vom Bolzplatz bis zum Weltpokal braucht es keine schnellen Finger, sondern einen Plan für die nächsten drei Züge.',
+      regeln: [
+        'Pfeiltasten, WASD oder wischen: alle Vereine rutschen in eine Richtung.',
+        'Treffen sich zwei gleiche, steigt einer auf. Jeder Aufstieg bringt Punkte.',
+        'Ziel ist die Königsklasse. Danach darfst du weiterspielen.',
+        'Videobeweis: nimmt deinen letzten Zug zurück. Einer zum Start, jede neue Liga ab Regionalliga bringt einen dazu, höchstens 3.'
+      ],
+      // \u00ad = weiche Trennstelle, damit lange Namen auf schmalen Steinen sauber umbrechen
+      ligen: ['Bolz\u00adplatz', 'Kreis\u00adliga', 'Bezirks\u00adliga', 'Landes\u00adliga', 'Ober\u00adliga', 'Regional\u00adliga', '3. Liga', '2. Liga', 'Bundes\u00adliga', 'Europa\u00adpokal', 'Königs\u00adklasse', 'Welt\u00adpokal', 'Legende'],
+      punkte: 'Punkte', best: 'Highscore', stufe: 'Stufe', var: 'Videobeweis', neu: 'Neues Spiel',
+      sieg: 'Königsklasse erreicht!', siegText: 'Dein Verein spielt ganz oben mit. Weiterspielen bis zum Weltpokal?',
+      weiter: 'Weiterspielen', ende: 'Abpfiff!', rec: 'Neuer Highscore!', endeText: 'Kein Zug mehr möglich. Höchste Liga: {l}.',
+      kombi: ['', '', 'Doppelpack!', 'Hattrick!', 'Viererpack!'],
+      nochmal: 'Nochmal', aufstieg: 'Aufstieg in die {l}!', varPlus: '+1 Videobeweis', varGenutzt: 'Videobeweis: Zug zurückgenommen'
+    },
+    en: {
+      lead: 'Slide two equal clubs together and they move up a league. Getting from the park pitch to the World Cup takes no fast fingers, just a plan for the next three moves.',
+      regeln: [
+        'Arrow keys, WASD or swipe: every club slides one way.',
+        'When two equal clubs meet, one gets promoted. Every promotion scores points.',
+        'Reach the Elite Cup to win. You can keep playing after that.',
+        'Video review: takes back your last move. One at the start, each new league from National up adds one, 3 at most.'
+      ],
+      ligen: ['Park pitch', 'Sunday League', 'District', 'County', 'Regional', 'National', 'League Two', 'League One', 'Top Flight', 'Euro Cup', 'Elite Cup', 'World Cup', 'Legend'],
+      punkte: 'Points', best: 'High score', stufe: 'Tier', var: 'Video review', neu: 'New game',
+      sieg: 'Elite Cup reached!', siegText: 'Your club is at the very top. Keep going for the World Cup?',
+      weiter: 'Keep playing', ende: 'Full time!', rec: 'New high score!', endeText: 'No moves left. Highest league: {l}.',
+      kombi: ['', '', 'Brace!', 'Hat-trick!', 'Four-timer!'],
+      nochmal: 'Play again', aufstieg: 'Promoted to {l}!', varPlus: '+1 video review', varGenutzt: 'Video review: move taken back'
+    }
+  };
+  var sprache = ((navigator.languages && navigator.languages[0]) || navigator.language || 'de').slice(0, 2).toLowerCase();
+  var T = TEXTE[sprache] || TEXTE.en;
+  document.documentElement.lang = TEXTE[sprache] ? sprache : 'en';
+  var FORMAT = null;
+  try { FORMAT = new Intl.NumberFormat(sprache); } catch (e) { FORMAT = null; }
+  function zahl(n) { n = Math.floor(n); return FORMAT ? FORMAT.format(n) : String(n); }
+
+  // ── Regeln als Zahlen ────────────────────────────────────────────────────
+  var N = 4;                     // 4 × 4 Felder
+  var SIEG_STUFE = 11;           // Königsklasse
+  var VAR_AB_STUFE = 6;          // ab Regionalliga gibt jede neue Liga einen Videobeweis
+  var VAR_MAX = 3;
+  var SPEICHER = 'prompt_cockpit_aufstieg_highscore';
+  var DAUER = 120;               // ms, muss zu .stein transition passen
+
+  // Farbe je Stufe: vom Rasen über Dunkelgrün zu Europa-Blau, Königsklassen-Lila und Weltpokal-Gold
+  var FARBEN = [null,
+    ['#eef3ef', '#17251c'], ['#dcebdf', '#17251c'], ['#c3e1ca', '#17251c'], ['#9fd2ac', '#17251c'],
+    ['#6fbd86', '#0f2416'], ['#47a266', '#ffffff'], ['#2f8a4a', '#ffffff'], ['#23703b', '#ffffff'],
+    ['#174f2a', '#ffffff'], ['#2f86eb', '#ffffff'], ['#a259e6', '#ffffff'], ['#f2c230', '#17251c'], ['#17251c', '#f2c230']];
+  var ICONS = [null, '⚽', '👟', '🧤', '🚩', '🥉', '🥈', '🥇', '🏅', '🏆', '🌍', '👑', '🏆', '⭐'];
+
+  // ── Elemente ─────────────────────────────────────────────────────────────
+  function $(id) { return document.getElementById(id); }
+  var brett = $('brett'), elPunkte = $('punkte'), elBest = $('best'), elVar = $('var'), elNeu = $('neu');
+  var elPanel = $('panel'), elPanelTitel = $('panelTitel'), elPanelText = $('panelText'), elPanelKnopf = $('panelKnopf'), elPanelZweit = $('panelZweit');
+  var elMeldung = $('meldung');
+  $('lead').textContent = T.lead;
+  $('lblPunkte').textContent = T.punkte;
+  $('lblBest').textContent = T.best;
+  elNeu.textContent = T.neu;
+  T.regeln.forEach(function (r) { var li = document.createElement('li'); li.textContent = r; $('regeln').appendChild(li); });
+
+  function liga(stufe) { return T.ligen[Math.min(stufe, T.ligen.length) - 1]; }
+  function ligaText(stufe) { return liga(stufe).replace(/\u00ad/g, ''); }
+
+  // ── Zustand ──────────────────────────────────────────────────────────────
+  var steine = [];               // { id, stufe, r, c, el }
+  var naechsteId = 1;
+  var punkte = 0, rekord = 0, varAnzahl = 1, besteStufe = 1;
+  var siegGezeigt = false, vorbei = false, sperre = false;
+  var rueck = null;              // Stand vor dem letzten Zug
+  try { rekord = parseInt(localStorage.getItem(SPEICHER), 10) || 0; } catch (e) { rekord = 0; }
+
+  // ── Maße ─────────────────────────────────────────────────────────────────
+  var groesse = 0, luecke = 0;
+  function messen() {
+    var b = brett.clientWidth;
+    luecke = Math.max(6, Math.round(b * 0.025));
+    groesse = (b - luecke * (N + 1)) / N;
+    brett.style.setProperty('--fs', Math.max(10, Math.round(groesse * 0.135)) + 'px');
+    var z = brett.querySelectorAll('.zelle');
+    for (var i = 0; i < z.length; i++) setzen(z[i], Math.floor(i / N), i % N);
+    steine.forEach(function (s) { setzen(s.el, s.r, s.c); });
+  }
+  function setzen(el, r, c) {
+    el.style.width = groesse + 'px';
+    el.style.height = groesse + 'px';
+    el.style.transform = 'translate(' + (luecke + c * (groesse + luecke)) + 'px,' + (luecke + r * (groesse + luecke)) + 'px)';
+  }
+
+  // Hintergrundzellen
+  for (var z = 0; z < N * N; z++) { var d = document.createElement('div'); d.className = 'zelle'; brett.insertBefore(d, elPanel); }
+
+  // ── Steine ───────────────────────────────────────────────────────────────
+  function zeichneStein(s) {
+    var f = FARBEN[Math.min(s.stufe, FARBEN.length - 1)];
+    s.el.style.background = f[0];
+    s.el.style.color = f[1];
+    s.el.classList.toggle('glanz', s.stufe >= 10);
+    s.el.style.setProperty('--glow', f[0]);
+    s.el.innerHTML = '';
+    var i = document.createElement('span'); i.className = 'icon'; i.textContent = ICONS[Math.min(s.stufe, ICONS.length - 1)];
+    var n = document.createElement('span'); n.className = 'name'; n.textContent = liga(s.stufe);
+    var st = document.createElement('span'); st.className = 'stufe'; st.textContent = T.stufe + ' ' + s.stufe;
+    s.el.appendChild(i); s.el.appendChild(n); s.el.appendChild(st);
+    s.el.setAttribute('aria-label', ligaText(s.stufe));
+  }
+  function neuerStein(stufe, r, c, klasse) {
+    var el = document.createElement('div');
+    el.className = 'stein' + (klasse ? ' ' + klasse : '');
+    var s = { id: naechsteId++, stufe: stufe, r: r, c: c, el: el };
+    zeichneStein(s);
+    setzen(el, r, c);
+    brett.insertBefore(el, elPanel);
+    steine.push(s);
+    return s;
+  }
+  function raster() {
+    var g = [];
+    for (var r = 0; r < N; r++) { g.push([]); for (var c = 0; c < N; c++) g[r].push(null); }
+    steine.forEach(function (s) { g[s.r][s.c] = s; });
+    return g;
+  }
+  function zufallsStein() {
+    var g = raster(), frei = [];
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) if (!g[r][c]) frei.push([r, c]);
+    if (!frei.length) return;
+    var f = frei[Math.floor(Math.random() * frei.length)];
+    neuerStein(Math.random() < 0.9 ? 1 : 2, f[0], f[1], 'neu');
+  }
+
+  // ── Effekte ──────────────────────────────────────────────────────────────
+  var ruhig = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function mitte(r, c) { return { x: luecke + c * (groesse + luecke) + groesse / 2, y: luecke + r * (groesse + luecke) + groesse / 2 }; }
+  function weg(el, ms) { setTimeout(function () { el.remove(); }, ms); }
+  function effekt(klasse) { var el = document.createElement('div'); el.className = klasse; brett.appendChild(el); return el; }
+  function farbeVon(stufe) { var f = FARBEN[Math.min(stufe, FARBEN.length - 1)]; return stufe <= 4 ? '#f2c230' : f[0]; }
+
+  function ring(s) {
+    if (ruhig) return;
+    var el = effekt('ring');
+    el.style.width = el.style.height = groesse + 'px';
+    el.style.left = (luecke + s.c * (groesse + luecke)) + 'px';
+    el.style.top = (luecke + s.r * (groesse + luecke)) + 'px';
+    el.style.setProperty('--farbe', farbeVon(s.stufe));
+    weg(el, 520);
+  }
+  function funken(s, anzahl) {
+    if (ruhig) return;
+    var m = mitte(s.r, s.c), farben = [farbeVon(s.stufe), '#f2c230', '#ffffff'];
+    for (var i = 0; i < anzahl; i++) {
+      var el = effekt('funke');
+      var w = Math.random() * Math.PI * 2, d = groesse * (0.55 + Math.random() * 0.6), g = 5 + Math.random() * 6;
+      el.style.width = el.style.height = g + 'px';
+      el.style.background = farben[i % farben.length];
+      el.style.setProperty('--x0', (m.x - g / 2) + 'px');
+      el.style.setProperty('--y0', (m.y - g / 2) + 'px');
+      el.style.setProperty('--x1', (m.x - g / 2 + Math.cos(w) * d) + 'px');
+      el.style.setProperty('--y1', (m.y - g / 2 + Math.sin(w) * d) + 'px');
+      var dauer = 550 + Math.random() * 350;
+      el.style.setProperty('--dauer', dauer + 'ms');
+      weg(el, dauer + 50);
+    }
+  }
+  function konfetti(anzahl) {
+    if (ruhig) return;
+    var b = brett.clientWidth, h = brett.clientHeight;
+    var farben = ['#f2c230', '#2f86eb', '#a259e6', '#e5534b', '#ffffff', '#57d37a'];
+    for (var i = 0; i < anzahl; i++) {
+      var el = effekt('konfetti');
+      var x = Math.random() * b, dauer = 1200 + Math.random() * 900, verz = Math.random() * 350;
+      el.style.background = farben[i % farben.length];
+      el.style.setProperty('--x0', x + 'px');
+      el.style.setProperty('--y0', '-16px');
+      el.style.setProperty('--x1', (x + (Math.random() * 2 - 1) * 70) + 'px');
+      el.style.setProperty('--y1', (h + 16) + 'px');
+      el.style.setProperty('--dreh', ((Math.random() < 0.5 ? -1 : 1) * (360 + Math.random() * 540)) + 'deg');
+      el.style.setProperty('--dauer', dauer + 'ms');
+      el.style.setProperty('--verz', verz + 'ms');
+      weg(el, dauer + verz + 50);
+    }
+  }
+  var aktivesBanner = null;
+  function banner(text, unter, klasse) {
+    if (aktivesBanner) aktivesBanner.remove();
+    var el = effekt('banner' + (klasse ? ' ' + klasse : ''));
+    el.textContent = text;
+    if (unter) { var u = document.createElement('small'); u.textContent = unter; el.appendChild(u); }
+    aktivesBanner = el;
+    weg(el, klasse === 'klein' ? 1050 : 1550);
+  }
+  function plusPunkte(n) {
+    if (n <= 0) return;
+    var kasten = elPunkte.parentNode;
+    if (!ruhig) {
+      var el = document.createElement('span');
+      el.className = 'plus';
+      el.textContent = '+' + zahl(n);
+      kasten.appendChild(el);
+      weg(el, 900);
+    }
+    kasten.classList.remove('puls'); void kasten.offsetWidth; kasten.classList.add('puls');
+  }
+  function brettKlasse(k) { brett.classList.remove(k); void brett.offsetWidth; brett.classList.add(k); setTimeout(function () { brett.classList.remove(k); }, 450); }
+
+  // Punkte zählen hoch statt zu springen
+  var angezeigt = 0, rollId = 0;
+  function punkteZeigen() {
+    if (angezeigt === punkte) return;
+    if (ruhig || punkte < angezeigt) { angezeigt = punkte; elPunkte.textContent = zahl(punkte); return; }
+    var von = angezeigt, bis = punkte, t0 = performance.now(), id = ++rollId;
+    (function schritt(t) {
+      if (id !== rollId) return;
+      var k = Math.min(1, (t - t0) / 380);
+      angezeigt = Math.round(von + (bis - von) * (1 - Math.pow(1 - k, 3)));
+      elPunkte.textContent = zahl(angezeigt);
+      if (k < 1) requestAnimationFrame(schritt);
+    })(t0);
+  }
+
+  // ── Anzeige ──────────────────────────────────────────────────────────────
+  var meldungTimer = 0;
+  function melden(text) {
+    elMeldung.textContent = text;
+    clearTimeout(meldungTimer);
+    meldungTimer = setTimeout(function () { elMeldung.textContent = ''; }, 2200);
+  }
+  function anzeige() {
+    punkteZeigen();
+    elBest.textContent = zahl(Math.max(rekord, punkte));
+    elVar.textContent = '📺 ' + T.var + ' ×' + varAnzahl;
+    elVar.disabled = varAnzahl <= 0 || !rueck || vorbei || sperre;
+  }
+  function tafel(titel, text, knopf, zweit, neu) {
+    elPanelTitel.textContent = titel;
+    elPanelText.textContent = text;
+    elPanelKnopf.textContent = knopf;
+    elPanelZweit.hidden = !zweit;
+    elPanelZweit.textContent = zweit || '';
+    elPanel.classList.toggle('neu', !!neu);
+    elPanel.hidden = false;
+    try { elPanelKnopf.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+  }
+
+  // ── Spielablauf ──────────────────────────────────────────────────────────
+  function neuesSpiel() {
+    steine.forEach(function (s) { s.el.remove(); });
+    steine = [];
+    punkte = 0; varAnzahl = 1; besteStufe = 1;
+    siegGezeigt = false; vorbei = false; sperre = false; rueck = null;
+    elPanel.hidden = true;
+    zufallsStein(); zufallsStein();
+    anzeige();
+    try { brett.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+  }
+
+  function stand() {
+    return { punkte: punkte, varAnzahl: varAnzahl, besteStufe: besteStufe, steine: steine.map(function (s) { return [s.stufe, s.r, s.c]; }) };
+  }
+
+  var RICHTUNG = { l: [0, -1], r: [0, 1], o: [-1, 0], u: [1, 0] };
+
+  function zug(richtung) {
+    if (sperre || vorbei || !elPanel.hidden) return;
+    var v = RICHTUNG[richtung];
+    var g = raster();
+    var vorher = stand();
+    var bewegt = false, gewinn = 0;
+    var zeilen = [0, 1, 2, 3], spalten = [0, 1, 2, 3];
+    if (v[0] === 1) zeilen.reverse();
+    if (v[1] === 1) spalten.reverse();
+    var verschmolzen = {};       // id → true, damit ein Stein pro Zug nur einmal aufsteigt
+    var aufgehen = [];           // Steine, die in einem anderen aufgehen
+
+    zeilen.forEach(function (r) {
+      spalten.forEach(function (c) {
+        var s = g[r][c];
+        if (!s) return;
+        var nr = r, nc = c;
+        for (;;) {
+          var rr = nr + v[0], cc = nc + v[1];
+          if (rr < 0 || rr >= N || cc < 0 || cc >= N) break;
+          var o = g[rr][cc];
+          if (!o) { nr = rr; nc = cc; continue; }
+          if (o.stufe === s.stufe && !verschmolzen[o.id]) {
+            g[r][c] = null;
+            o.stufe++;
+            verschmolzen[o.id] = true;
+            gewinn += Math.pow(2, o.stufe);
+            s.r = rr; s.c = cc;
+            aufgehen.push({ s: s, ziel: o });
+            bewegt = true;
+            return;
+          }
+          break;
+        }
+        if (nr !== r || nc !== c) {
+          g[r][c] = null; g[nr][nc] = s;
+          s.r = nr; s.c = nc;
+          bewegt = true;
+        }
+      });
+    });
+
+    if (!bewegt) {
+      if (!ruhig) {
+        brett.style.setProperty('--sx', (v[1] * 6) + 'px');
+        brett.style.setProperty('--sy', (v[0] * 6) + 'px');
+        brettKlasse('stoss');
+      }
+      return;
+    }
+    aufgehen.forEach(function (w) { w.s.el.classList.add('oben'); });
+    rueck = vorher;
+    punkte += gewinn;
+    sperre = true;
+    steine.forEach(function (s) { setzen(s.el, s.r, s.c); });
+    anzeige();
+
+    setTimeout(function () {
+      var neueLiga = 0, varDazu = false;
+      aufgehen.forEach(function (w) {
+        w.s.el.remove();
+        steine.splice(steine.indexOf(w.s), 1);
+        zeichneStein(w.ziel);
+        w.ziel.el.classList.remove('plopp');
+        void w.ziel.el.offsetWidth;
+        w.ziel.el.classList.add('plopp');
+        ring(w.ziel);
+        funken(w.ziel, Math.min(22, 4 + w.ziel.stufe * 1.5));
+        if (w.ziel.stufe > besteStufe) {
+          besteStufe = w.ziel.stufe;
+          neueLiga = besteStufe;
+          if (besteStufe >= VAR_AB_STUFE && varAnzahl < VAR_MAX) { varAnzahl++; varDazu = true; }
+        }
+      });
+      plusPunkte(gewinn);
+      if (neueLiga >= 3) {
+        banner(T.aufstieg.replace('{l}', ligaText(neueLiga)), varDazu ? '📺 ' + T.varPlus : '', neueLiga >= 10 ? 'gold' : '');
+        if (neueLiga >= VAR_AB_STUFE) konfetti(Math.min(90, 20 + (neueLiga - VAR_AB_STUFE) * 14));
+      } else if (aufgehen.length >= 2) {
+        banner(T.kombi[Math.min(aufgehen.length, T.kombi.length - 1)], '', 'klein');
+      }
+      zufallsStein();
+      sperre = false;
+      if (punkte > rekord) {
+        rekord = punkte;
+        try { localStorage.setItem(SPEICHER, String(rekord)); } catch (e) { /* ohne Speicher weiterspielen */ }
+      }
+      anzeige();
+      if (besteStufe >= SIEG_STUFE && !siegGezeigt) {
+        siegGezeigt = true;
+        konfetti(140);
+        setTimeout(function () { tafel(T.sieg, T.siegText, T.weiter, T.neu, true); }, 700);
+      } else if (!zugMoeglich()) {
+        spielEnde();
+      }
+    }, DAUER);
+  }
+
+  function zugMoeglich() {
+    var g = raster();
+    for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) {
+      var s = g[r][c];
+      if (!s) return true;
+      if (c + 1 < N && g[r][c + 1] && g[r][c + 1].stufe === s.stufe) return true;
+      if (r + 1 < N && g[r + 1][c] && g[r + 1][c].stufe === s.stufe) return true;
+    }
+    return false;
+  }
+
+  function spielEnde() {
+    vorbei = true;
+    var neu = punkte > 0 && punkte >= rekord;
+    anzeige();
+    if (!ruhig) brettKlasse('wackeln');
+    if (neu) konfetti(60);
+    setTimeout(function () { if (vorbei) tafel(neu ? T.rec : T.ende, T.endeText.replace('{l}', ligaText(besteStufe)), T.nochmal, varAnzahl > 0 && rueck ? '📺 ' + T.var : '', neu); }, ruhig ? 0 : 450);
+  }
+
+  function videobeweis() {
+    if (!rueck || varAnzahl <= 0 || sperre) return;
+    var r = rueck;
+    steine.forEach(function (s) { s.el.remove(); });
+    steine = [];
+    r.steine.forEach(function (t) { neuerStein(t[0], t[1], t[2]); });
+    punkte = r.punkte; besteStufe = r.besteStufe;
+    varAnzahl = r.varAnzahl - 1;
+    rueck = null;
+    vorbei = false;
+    elPanel.hidden = true;
+    if (!ruhig) brettKlasse('rueck');
+    banner('📺 ' + T.varGenutzt, '', 'klein');
+    anzeige();
+    try { brett.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+  }
+
+  // ── Eingabe ──────────────────────────────────────────────────────────────
+  var TASTEN = { ArrowLeft: 'l', ArrowRight: 'r', ArrowUp: 'o', ArrowDown: 'u', a: 'l', d: 'r', w: 'o', s: 'u', A: 'l', D: 'r', W: 'o', S: 'u' };
+  window.addEventListener('keydown', function (e) {
+    if (e.target && (e.target.tagName === 'BUTTON') && (e.key === 'Enter' || e.key === ' ')) return;
+    var r = TASTEN[e.key];
+    if (r) { e.preventDefault(); zug(r); }
+  });
+
+  var start = null;
+  brett.addEventListener('pointerdown', function (e) {
+    if (e.target.closest && e.target.closest('.panel')) return;
+    start = { x: e.clientX, y: e.clientY, id: e.pointerId };
+    try { brett.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+  });
+  brett.addEventListener('pointerup', function (e) {
+    if (!start || e.pointerId !== start.id) return;
+    var dx = e.clientX - start.x, dy = e.clientY - start.y;
+    start = null;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    zug(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'u' : 'o'));
+  });
+  brett.addEventListener('pointercancel', function () { start = null; });
+
+  elNeu.addEventListener('click', neuesSpiel);
+  elVar.addEventListener('click', videobeweis);
+  elPanelKnopf.addEventListener('click', function () {
+    if (vorbei) neuesSpiel();
+    else { elPanel.hidden = true; try { brett.focus({ preventScroll: true }); } catch (e) { /* egal */ } }
+  });
+  elPanelZweit.addEventListener('click', function () { if (vorbei) videobeweis(); else neuesSpiel(); });
+
+  window.addEventListener('resize', messen);
+  if (window.ResizeObserver) new ResizeObserver(messen).observe(brett);
+  messen();
+  neuesSpiel();
+  messen();
+
+  // Für Tests: Zugriff auf Zustand und Züge, ohne Einfluss aufs Spiel
+  window.__aufstieg = { zug: zug, steine: function () { return steine; }, punkte: function () { return punkte; }, var: function () { return varAnzahl; }, videobeweis: videobeweis, neuerStein: neuerStein, neuesSpiel: neuesSpiel, zugMoeglich: zugMoeglich, leeren: function () { steine.forEach(function (s) { s.el.remove(); }); steine = []; } };
+})();
+</script>
+</body>
+</html>

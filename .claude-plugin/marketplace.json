@@ -1,0 +1,11 @@
+{
+  "name": "prompt-cockpit",
+  "owner": { "name": "Kemal Duran" },
+  "description": "Prompt Cockpit: Leiste über dem Eingabefeld von Claude mit Limit-Anzeige, Diktat-Aufräumer und 5 Fußball-Minispielen. A bar above the Claude prompt with usage limits, a dictation cleaner and 5 football mini games.",
+  "plugins": [
+    { "name": "prompt-cockpit", "source": "./prompt-cockpit" },
+    { "name": "limit-band", "source": "./limit-band" },
+    { "name": "brain", "source": "./brain" },
+    { "name": "game", "source": "./game" }
+  ]
+}

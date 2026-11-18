@@ -1,0 +1,765 @@
+[
+ {
+  "kategorie": "gruendung",
+  "name": "FC Bayern München",
+  "wert": 1900,
+  "zusatz": "München",
+  "quelle": "https://de.wikipedia.org/wiki/FC_Bayern_München"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Borussia Dortmund",
+  "wert": 1909,
+  "zusatz": "Dortmund",
+  "quelle": "https://de.wikipedia.org/wiki/Borussia_Dortmund"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "FC Schalke 04",
+  "wert": 1904,
+  "zusatz": "Gelsenkirchen",
+  "quelle": "https://de.wikipedia.org/wiki/FC_Schalke_04"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "SV Werder Bremen",
+  "wert": 1899,
+  "zusatz": "Bremen",
+  "quelle": "https://de.wikipedia.org/wiki/Werder_Bremen"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Borussia Mönchengladbach",
+  "wert": 1900,
+  "zusatz": "Mönchengladbach",
+  "quelle": "https://de.wikipedia.org/wiki/Borussia_Mönchengladbach"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "1. FC Köln",
+  "wert": 1948,
+  "zusatz": "Köln",
+  "quelle": "https://de.wikipedia.org/wiki/1._FC_Köln"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Eintracht Frankfurt",
+  "wert": 1899,
+  "zusatz": "Frankfurt am Main",
+  "quelle": "https://de.wikipedia.org/wiki/Eintracht_Frankfurt"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Bayer 04 Leverkusen",
+  "wert": 1904,
+  "zusatz": "Leverkusen",
+  "quelle": "https://de.wikipedia.org/wiki/Bayer_04_Leverkusen"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Hertha BSC",
+  "wert": 1892,
+  "zusatz": "Berlin",
+  "quelle": "https://de.wikipedia.org/wiki/Hertha_BSC"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "1. FC Kaiserslautern",
+  "wert": 1900,
+  "zusatz": "Kaiserslautern",
+  "quelle": "https://de.wikipedia.org/wiki/1._FC_Kaiserslautern"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "1. FC Nürnberg",
+  "wert": 1900,
+  "zusatz": "Nürnberg",
+  "quelle": "https://de.wikipedia.org/wiki/1._FC_Nürnberg"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Hannover 96",
+  "wert": 1896,
+  "zusatz": "Hannover",
+  "quelle": "https://de.wikipedia.org/wiki/Hannover_96"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "TSV 1860 München",
+  "wert": 1860,
+  "zusatz": "München",
+  "quelle": "https://de.wikipedia.org/wiki/TSV_1860_München"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "SC Freiburg",
+  "wert": 1904,
+  "zusatz": "Freiburg im Breisgau",
+  "quelle": "https://de.wikipedia.org/wiki/SC_Freiburg"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "1. FSV Mainz 05",
+  "wert": 1905,
+  "zusatz": "Mainz",
+  "quelle": "https://de.wikipedia.org/wiki/1._FSV_Mainz_05"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Fortuna Düsseldorf",
+  "wert": 1895,
+  "zusatz": "Düsseldorf",
+  "quelle": "https://de.wikipedia.org/wiki/Fortuna_Düsseldorf"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "RB Leipzig",
+  "wert": 2009,
+  "zusatz": "Leipzig",
+  "quelle": "https://de.wikipedia.org/wiki/RB_Leipzig"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "1. FC Union Berlin",
+  "wert": 1966,
+  "zusatz": "Berlin",
+  "quelle": "https://de.wikipedia.org/wiki/1._FC_Union_Berlin"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Eintracht Braunschweig",
+  "wert": 1895,
+  "zusatz": "Braunschweig",
+  "quelle": "https://de.wikipedia.org/wiki/Eintracht_Braunschweig"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "MSV Duisburg",
+  "wert": 1902,
+  "zusatz": "Duisburg",
+  "quelle": "https://de.wikipedia.org/wiki/MSV_Duisburg"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Real Madrid",
+  "wert": 1902,
+  "zusatz": "Madrid",
+  "quelle": "https://de.wikipedia.org/wiki/Real_Madrid"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "FC Barcelona",
+  "wert": 1899,
+  "zusatz": "Barcelona",
+  "quelle": "https://de.wikipedia.org/wiki/FC_Barcelona"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Manchester United",
+  "wert": 1878,
+  "zusatz": "Manchester",
+  "quelle": "https://de.wikipedia.org/wiki/Manchester_United"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Juventus Turin",
+  "wert": 1897,
+  "zusatz": "Turin",
+  "quelle": "https://de.wikipedia.org/wiki/Juventus_Turin"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "AC Mailand",
+  "wert": 1899,
+  "zusatz": "Mailand",
+  "quelle": "https://de.wikipedia.org/wiki/AC_Mailand"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Paris Saint-Germain",
+  "wert": 1970,
+  "zusatz": "Paris",
+  "quelle": "https://de.wikipedia.org/wiki/Paris_Saint-Germain"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Ajax Amsterdam",
+  "wert": 1900,
+  "zusatz": "Amsterdam",
+  "quelle": "https://de.wikipedia.org/wiki/Ajax_Amsterdam"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Benfica Lissabon",
+  "wert": 1904,
+  "zusatz": "Lissabon",
+  "quelle": "https://de.wikipedia.org/wiki/Benfica_Lissabon"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Celtic Glasgow",
+  "wert": 1887,
+  "zusatz": "Glasgow",
+  "quelle": "https://de.wikipedia.org/wiki/Celtic_Glasgow"
+ },
+ {
+  "kategorie": "gruendung",
+  "name": "Boca Juniors",
+  "wert": 1905,
+  "zusatz": "Buenos Aires",
+  "quelle": "https://de.wikipedia.org/wiki/Boca_Juniors"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Gerd Müller",
+  "wert": 365,
+  "zusatz": "FC Bayern München",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Robert Lewandowski",
+  "wert": 312,
+  "zusatz": "FC Bayern München",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Klaus Fischer",
+  "wert": 268,
+  "zusatz": "FC Schalke 04",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Jupp Heynckes",
+  "wert": 220,
+  "zusatz": "Borussia Mönchengladbach",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Manfred Burgsmüller",
+  "wert": 213,
+  "zusatz": "Borussia Dortmund",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Claudio Pizarro",
+  "wert": 197,
+  "zusatz": "Werder Bremen",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Stefan Kuntz",
+  "wert": 179,
+  "zusatz": "1. FC Kaiserslautern",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Mario Gómez",
+  "wert": 170,
+  "zusatz": "VfB Stuttgart",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Karl-Heinz Rummenigge",
+  "wert": 162,
+  "zusatz": "FC Bayern München",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Bernd Hölzenbein",
+  "wert": 160,
+  "zusatz": "Eintracht Frankfurt",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Stefan Kießling",
+  "wert": 144,
+  "zusatz": "Bayer 04 Leverkusen",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Uwe Seeler",
+  "wert": 137,
+  "zusatz": "Hamburger SV",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Horst Hrubesch",
+  "wert": 136,
+  "zusatz": "Hamburger SV",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Giovane Élber",
+  "wert": 133,
+  "zusatz": "FC Bayern München",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Rudi Völler",
+  "wert": 132,
+  "zusatz": "Werder Bremen",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Miroslav Klose",
+  "wert": 121,
+  "zusatz": "Werder Bremen",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Lothar Matthäus",
+  "wert": 121,
+  "zusatz": "FC Bayern München",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Pierre Littbarski",
+  "wert": 116,
+  "zusatz": "1. FC Köln",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Jürgen Klinsmann",
+  "wert": 110,
+  "zusatz": "VfB Stuttgart",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "bl_tore",
+  "name": "Stéphane Chapuisat",
+  "wert": 106,
+  "zusatz": "Borussia Dortmund",
+  "quelle": "https://de.wikipedia.org/wiki/Liste_der_erfolgreichsten_Torschützen_der_Fußball-Bundesliga"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Lothar Matthäus",
+  "wert": 150,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Miroslav Klose",
+  "wert": 137,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Thomas Müller",
+  "wert": 131,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Lukas Podolski",
+  "wert": 130,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Bastian Schweinsteiger",
+  "wert": 121,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Toni Kroos",
+  "wert": 114,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Philipp Lahm",
+  "wert": 113,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Jürgen Klinsmann",
+  "wert": 108,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Jürgen Kohler",
+  "wert": 105,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Per Mertesacker",
+  "wert": 104,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Franz Beckenbauer",
+  "wert": 103,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Thomas Häßler",
+  "wert": 101,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Deutsche_Fußballnationalmannschaft"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Berti Vogts",
+  "wert": 96,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Berti_Vogts"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Sepp Maier",
+  "wert": 95,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Sepp_Maier"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Mesut Özil",
+  "wert": 92,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Mesut_Özil"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Oliver Kahn",
+  "wert": 86,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Oliver_Kahn"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Andreas Brehme",
+  "wert": 86,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/wiki/Andreas_Brehme"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Ronald Kreer",
+  "wert": 65,
+  "zusatz": "DDR",
+  "quelle": "https://de.wikipedia.org/wiki/Fußballnationalmannschaft_der_DDR"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Matthias Liebers",
+  "wert": 59,
+  "zusatz": "DDR",
+  "quelle": "https://de.wikipedia.org/wiki/Fußballnationalmannschaft_der_DDR"
+ },
+ {
+  "kategorie": "laenderspiele",
+  "name": "Rainer Ernst",
+  "wert": 56,
+  "zusatz": "DDR",
+  "quelle": "https://de.wikipedia.org/wiki/Fußballnationalmannschaft_der_DDR"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Miroslav Klose",
+  "wert": 16,
+  "zusatz": "Deutschland",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Ronaldo",
+  "wert": 15,
+  "zusatz": "Brasilien",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Gerd Müller",
+  "wert": 14,
+  "zusatz": "Deutschland",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Just Fontaine",
+  "wert": 13,
+  "zusatz": "Frankreich",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Pelé",
+  "wert": 12,
+  "zusatz": "Brasilien",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Sándor Kocsis",
+  "wert": 11,
+  "zusatz": "Ungarn",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Jürgen Klinsmann",
+  "wert": 11,
+  "zusatz": "Deutschland",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Helmut Rahn",
+  "wert": 10,
+  "zusatz": "Deutschland",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Gary Lineker",
+  "wert": 10,
+  "zusatz": "England",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Gabriel Batistuta",
+  "wert": 10,
+  "zusatz": "Argentinien",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Thomas Müller",
+  "wert": 10,
+  "zusatz": "Deutschland",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Eusébio",
+  "wert": 9,
+  "zusatz": "Portugal",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Paolo Rossi",
+  "wert": 9,
+  "zusatz": "Italien",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Diego Maradona",
+  "wert": 8,
+  "zusatz": "Argentinien",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "wm_tore",
+  "name": "Rudi Völler",
+  "wert": 8,
+  "zusatz": "Deutschland",
+  "quelle": "https://en.wikipedia.org/wiki/List_of_FIFA_World_Cup_top_goalscorers"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Real Madrid",
+  "wert": 15,
+  "zusatz": "Spanien",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "AC Mailand",
+  "wert": 7,
+  "zusatz": "Italien",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "FC Bayern München",
+  "wert": 6,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "FC Liverpool",
+  "wert": 6,
+  "zusatz": "England",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "FC Barcelona",
+  "wert": 5,
+  "zusatz": "Spanien",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Ajax Amsterdam",
+  "wert": 4,
+  "zusatz": "Niederlande",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Inter Mailand",
+  "wert": 3,
+  "zusatz": "Italien",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Manchester United",
+  "wert": 3,
+  "zusatz": "England",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Juventus Turin",
+  "wert": 2,
+  "zusatz": "Italien",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Benfica Lissabon",
+  "wert": 2,
+  "zusatz": "Portugal",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "FC Chelsea",
+  "wert": 2,
+  "zusatz": "England",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Nottingham Forest",
+  "wert": 2,
+  "zusatz": "England",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "FC Porto",
+  "wert": 2,
+  "zusatz": "Portugal",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Borussia Dortmund",
+  "wert": 1,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Steaua Bukarest",
+  "wert": 1,
+  "zusatz": "Rumänien",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Celtic Glasgow",
+  "wert": 1,
+  "zusatz": "Schottland",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Hamburger SV",
+  "wert": 1,
+  "zusatz": "Deutschland",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Manchester City",
+  "wert": 1,
+  "zusatz": "England",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Olympique Marseille",
+  "wert": 1,
+  "zusatz": "Frankreich",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Paris Saint-Germain",
+  "wert": 1,
+  "zusatz": "Frankreich",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Feyenoord Rotterdam",
+  "wert": 1,
+  "zusatz": "Niederlande",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Aston Villa",
+  "wert": 1,
+  "zusatz": "England",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "PSV Eindhoven",
+  "wert": 1,
+  "zusatz": "Niederlande",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ },
+ {
+  "kategorie": "europapokal",
+  "name": "Roter Stern Belgrad",
+  "wert": 1,
+  "zusatz": "Serbien",
+  "quelle": "https://de.wikipedia.org/w/index.php?title=UEFA_Champions_League&oldid=262385973"
+ }
+]

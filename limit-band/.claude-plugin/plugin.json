@@ -1,0 +1,9 @@
+{
+  "name": "limit-band",
+  "version": "1.0.0",
+  "description": "Zeigt über dem Eingabefeld dein 5-Std-Limit mit Balken und Reset-Zeit, das Wochenlimit und Higgsfield-Credits. Shows your 5-hour limit with bar and reset time, the weekly limit and Higgsfield credits above the prompt.",
+  "author": { "name": "Kemal Duran" },
+  "license": "MIT",
+  "keywords": ["mod", "limits", "usage", "higgsfield"],
+  "types": "./types/index.d.ts"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "brain",
+  "version": "1.0.0",
+  "description": "Button 🧠 Brain über dem Eingabefeld: räumt diktierten Text auf und macht daraus einen klaren Prompt. Button 🧠 Brain above the prompt: cleans up dictated text and turns it into a clear prompt.",
+  "author": { "name": "Kemal Duran" },
+  "license": "MIT",
+  "keywords": ["mod", "dictation", "prompt", "productivity"],
+  "types": "./types/index.d.ts"
+}

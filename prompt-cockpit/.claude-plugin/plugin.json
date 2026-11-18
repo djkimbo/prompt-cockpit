@@ -1,0 +1,9 @@
+{
+  "name": "prompt-cockpit",
+  "version": "1.0.0",
+  "description": "Installiert alle drei Mods von Prompt Cockpit: limit-band, brain und game. Installs all three Prompt Cockpit mods: limit-band, brain and game.",
+  "author": { "name": "Kemal Duran" },
+  "license": "MIT",
+  "keywords": ["mod", "limits", "dictation", "games", "productivity"],
+  "dependencies": ["limit-band", "brain", "game"]
+}

@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Elfmeter-Duell</title>
+<style>
+/* Elfmeter-Duell. Gleiche Karte und Farben wie der Fußball-Runner, eine Datei, keine Netzaufrufe. */
+:root {
+  --bg: #f2f5f3;
+  --card: #ffffff;
+  --ink: #17251c;
+  --muted: #5b6a61;
+  --pitch: #2f8a4a;
+  --pitch-2: #2a7f43;
+  --chalk: #ffffff;
+  --ball-ink: #1b2420;
+  --gold: #f2c230;
+  --rot: #e5534b;
+  --gruen: #57d37a;
+  --tribuene: #1d3a27;
+  --torwart: #f29f05;
+  --torwart-hose: #1b2420;
+  --haut: #e2b38c;
+  --haare: #33251a;
+  --ich-hose: #1f5c34;
+  --knopf-hover: #e3efe6;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--ink); }
+body {
+  margin: 0;
+  font-family: var(--font);
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card {
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(23, 37, 28, .06), 0 10px 30px rgba(23, 37, 28, .06);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+h1 { font-size: 1.9rem; line-height: 1.15; margin: 0; }
+.lead { font-size: 1.08rem; line-height: 1.5; color: var(--muted); margin: 0; }
+.game {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--pitch);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.game canvas { display: block; width: 100%; height: 460px; cursor: crosshair; touch-action: none; }
+.game canvas:focus { outline: none; }
+.game canvas:focus-visible { outline: 3px solid var(--chalk); outline-offset: -6px; }
+.hud {
+  position: absolute; inset: 0 0 auto;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: start;
+  padding: 10px 14px;
+  color: var(--chalk);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .3);
+}
+.score { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+.meta { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; opacity: .92; margin-top: 4px; }
+.schuesse { font-size: 1.05rem; letter-spacing: .18em; padding-top: 6px; white-space: nowrap; }
+.best { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-align: right; opacity: .92; }
+.best b { display: block; font-size: 1.3rem; letter-spacing: 0; }
+[hidden] { display: none !important; }
+.panel {
+  position: absolute; left: 50%; top: 56%;
+  transform: translate(-50%, -50%);
+  width: min(310px, calc(100% - 40px));
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background: rgba(12, 32, 19, .84);
+  color: var(--chalk);
+  text-align: center;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.panel-titel { margin: 0; font-size: 1.35rem; font-weight: 800; line-height: 1.2; }
+.panel.neu .panel-titel { color: var(--gold); }
+.panel-text { margin: 0; font-size: .95rem; font-weight: 600; line-height: 1.4; opacity: .93; }
+.ergebnis { margin: 0; display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
+.ergebnis div { display: flex; justify-content: space-between; gap: 12px; padding-block: 6px; border-bottom: 1px solid rgba(255, 255, 255, .15); }
+.ergebnis dt { font-weight: 600; opacity: .85; }
+.ergebnis dd { margin: 0; font-weight: 800; }
+.knopf {
+  margin-top: 4px;
+  appearance: none; border: 0; border-radius: 999px;
+  padding: 12px 18px;
+  font: inherit; font-size: 1rem; font-weight: 800;
+  background: var(--chalk); color: var(--ich-hose);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.knopf:hover { background: var(--knopf-hover); }
+.knopf:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.regeln { margin: 0; padding-left: 1.1em; color: var(--muted); line-height: 1.55; font-size: .95rem; }
+</style>
+</head>
+<body>
+<style id="handy">
+/* Handy-Grundlage (18.11.2026), gleich in allen Spielen: kein Doppeltipp-Zoom, kein Kontextmenü beim
+   langen Drücken, kein Zurückfedern der Seite, kompaktere Karte und Spielfläche passend zur Bildschirmhöhe. */
+html { touch-action: manipulation; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+.game, .arena, .brett, canvas { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+@media (max-width: 520px) {
+  body { padding-block: 10px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  .card { padding: 16px 12px; gap: 12px; border-radius: 16px; }
+  h1 { font-size: 1.45rem; }
+  .lead { font-size: .95rem; line-height: 1.45; }
+  .regeln { font-size: .88rem; }
+  .knopf, .wahl { min-height: 44px; }   /* Daumen-Mindestgröße */
+  .game canvas { height: clamp(360px, calc(100svh - 190px), 460px); }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .lead, .regeln { display: none; }
+  body { padding-block: 6px; }
+  .card { padding: 10px 12px; gap: 8px; }
+  h1 { font-size: 1.2rem; }
+  .game canvas { height: clamp(260px, calc(100svh - 70px), 460px); }
+}
+</style>
+<script id="handy-scroll">
+// Beim Start auf dem Handy die ganze Spielfläche ins Bild holen
+document.addEventListener('click', function (e) {
+  if (!e.target.closest || !e.target.closest('.panel .knopf, #neu, .panel button')) return;
+  var g = document.querySelector('.game, .arena, .brett');
+  if (!g) return;
+  var r = g.getBoundingClientRect();
+  if (r.top < 0 || r.bottom > window.innerHeight) g.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}, true);
+</script>
+<main class="card">
+  <h1 id="titel">Elfmeter-Duell</h1>
+  <p class="lead" id="lead"></p>
+
+  <div class="game">
+    <canvas id="feld" tabindex="0" aria-label="Elfmeter-Duell"></canvas>
+    <div class="hud">
+      <div>
+        <div class="score" id="score">0</div>
+        <div class="meta" id="meta"></div>
+      </div>
+      <div class="schuesse" id="schuesse" aria-label="Schüsse dieser Runde"></div>
+      <div class="best" id="best"></div>
+    </div>
+    <div class="panel" id="panel" aria-live="polite">
+      <p class="panel-titel" id="panelTitel" hidden></p>
+      <p class="panel-text" id="panelText"></p>
+      <dl class="ergebnis" id="ergebnis" hidden>
+        <div><dt id="lblPunkte"></dt><dd id="erPunkte"></dd></div>
+        <div><dt id="lblTore"></dt><dd id="erTore"></dd></div>
+        <div><dt id="lblRunde"></dt><dd id="erRunde"></dd></div>
+        <div><dt id="lblBest"></dt><dd id="erBest"></dd></div>
+      </dl>
+      <button type="button" class="knopf" id="knopf"></button>
+    </div>
+  </div>
+
+  <ul class="regeln" id="regeln"></ul>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Texte (Gerätesprache, Rückfall Englisch) ─────────────────────────────
+  var TEXTE = {
+    de: {
+      kopf: 'Elfmeter-Duell',
+      lead: 'Fünf Schüsse gegen einen Torwart mit Gedächtnis. Wer immer dieselbe Ecke nimmt, wird gelesen wie ein offenes Buch. Hier gewinnt, wer um die Ecke denkt.',
+      touch: 'Ins Tor tippen und halten: der Kraftbalken läuft. Loslassen schießt. Grün ist ideal.',
+      keys: 'Zielen mit Maus oder Pfeiltasten. Maustaste oder Leertaste halten lädt, loslassen schießt. Grün ist ideal.',
+      regeln: ['5 Schüsse pro Runde. Ab 3 Toren geht es in die nächste Runde.', 'Jede Runde wird der Torwart schneller und liest dich besser.', 'Ecken bringen mehr Punkte, Tore in Serie zählen mehrfach (bis ×3).', '5 von 5 Toren: +500 Bonus.'],
+      punkte: 'Punkte', tore: 'Tore', runde: 'Runde', serie: 'Serie', best: 'Highscore',
+      start: 'Anstoß', again: 'Nochmal', weiter: 'Weiter', over: 'Ausgeschieden!', rec: 'Neuer Highscore!',
+      tor: 'TOR!', gehalten: 'Gehalten!', drueber: 'Drüber!', vorbei: 'Vorbei!', pfosten: 'Pfosten!',
+      rundeGeschafft: 'Runde geschafft!', perfekt: 'Perfekte Runde! +500', naechste: 'Runde {n}: Der Torwart wird besser.',
+      zuWenig: '{t} von 5 Toren. Für die nächste Runde brauchst du 3.'
+    },
+    en: {
+      kopf: 'Penalty Duel',
+      lead: 'Five shots against a keeper with a memory. Pick the same corner twice and he reads you like a book. Thinking outside the box is the only way past him.',
+      touch: 'Tap inside the goal and hold: the power bar runs. Release to shoot. Green is ideal.',
+      keys: 'Aim with mouse or arrow keys. Hold mouse button or space to charge, release to shoot. Green is ideal.',
+      regeln: ['5 shots per round. Score 3 to reach the next round.', 'Each round the keeper gets quicker and reads you better.', 'Corners score more, goals in a row count multiple times (up to ×3).', '5 out of 5: +500 bonus.'],
+      punkte: 'Points', tore: 'Goals', runde: 'Round', serie: 'Streak', best: 'High score',
+      start: 'Kick off', again: 'Play again', weiter: 'Continue', over: 'Knocked out!', rec: 'New high score!',
+      tor: 'GOAL!', gehalten: 'Saved!', drueber: 'Over!', vorbei: 'Wide!', pfosten: 'Post!',
+      rundeGeschafft: 'Round cleared!', perfekt: 'Perfect round! +500', naechste: 'Round {n}: the keeper gets better.',
+      zuWenig: '{t} out of 5. You need 3 for the next round.'
+    }
+  };
+  var sprache = ((navigator.languages && navigator.languages[0]) || navigator.language || 'de').slice(0, 2).toLowerCase();
+  var T = TEXTE[sprache] || TEXTE.en;
+  document.documentElement.lang = TEXTE[sprache] ? sprache : 'en';
+  var FORMAT = null;
+  try { FORMAT = new Intl.NumberFormat(sprache); } catch (e) { FORMAT = null; }
+  function zahl(n) { n = Math.floor(n); return FORMAT ? FORMAT.format(n) : String(n); }
+  var touch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
+  // ── Elemente ─────────────────────────────────────────────────────────────
+  var cv = document.getElementById('feld');
+  var ctx = cv.getContext('2d');
+  var $ = function (id) { return document.getElementById(id); };
+  var elScore = $('score'), elMeta = $('meta'), elSchuesse = $('schuesse'), elBest = $('best');
+  var elPanel = $('panel'), elTitel = $('panelTitel'), elText = $('panelText'), elErgebnis = $('ergebnis'), elKnopf = $('knopf');
+  $('titel').textContent = T.kopf;
+  $('lead').textContent = T.lead;
+  $('lblPunkte').textContent = T.punkte;
+  $('lblTore').textContent = T.tore;
+  $('lblRunde').textContent = T.runde;
+  $('lblBest').textContent = T.best;
+  T.regeln.forEach(function (r) { var li = document.createElement('li'); li.textContent = r; $('regeln').appendChild(li); });
+
+  var css = getComputedStyle(document.documentElement);
+  function farbe(n) { return css.getPropertyValue(n).trim(); }
+  var C = {
+    pitch: farbe('--pitch'), pitch2: farbe('--pitch-2'), chalk: farbe('--chalk'), ink: farbe('--ball-ink'),
+    gold: farbe('--gold'), rot: farbe('--rot'), gruen: farbe('--gruen'), tribuene: farbe('--tribuene'),
+    torwart: farbe('--torwart'), torwartHose: farbe('--torwart-hose'), haut: farbe('--haut'), haare: farbe('--haare')
+  };
+  var FONT = farbe('--font');
+
+  function klemm(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function zufall(a, b) { return a + Math.random() * (b - a); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }
+
+  // ── Spielregeln als Zahlen ───────────────────────────────────────────────
+  var SCHUESSE = 5, MINDEST_TORE = 3, PERFEKT_BONUS = 500;
+  var KRAFT_ZYKLUS = 1.2;          // Sekunden für 0 → 1 → 0 des Kraftbalkens
+  var IDEAL_VON = 0.7, IDEAL_BIS = 0.9, ZU_STARK = 0.93;
+  var SPEICHER = 'prompt_cockpit_elfmeter_highscore';
+
+  // ── Geometrie (in CSS-Pixeln, bei jeder Größenänderung neu) ──────────────
+  var W = 0, H = 0, dpr = 1;
+  var G = { x0: 0, x1: 0, y0: 0, y1: 0, b: 0, h: 0, cx: 0 };  // Tor: links, rechts, Latte, Boden
+  var PFOSTEN = 6, BALL_R = 12;
+  var punkt = { x: 0, y: 0 };
+
+  function groesse() {
+    var r = cv.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 3);
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    G.b = Math.min(W * (W < 480 ? 0.9 : 0.78), 440);   // auf dem Handy breiteres Tor
+    G.h = G.b / 3;                       // Tor 7,32 m × 2,44 m
+    G.cx = W / 2;
+    G.x0 = G.cx - G.b / 2; G.x1 = G.cx + G.b / 2;
+    G.y0 = W < 480 ? 104 : 92; G.y1 = G.y0 + G.h;
+    punkt.x = W / 2; punkt.y = H - 74;
+    if (S) { S.ziel.x = klemm(S.ziel.x, zielMinX(), zielMaxX()); S.ziel.y = klemm(S.ziel.y, zielMinY(), zielMaxY()); }
+  }
+  function zielMinX() { return G.x0 - 30; }
+  function zielMaxX() { return G.x1 + 30; }
+  function zielMinY() { return G.y0 - 30; }
+  function zielMaxY() { return G.y1 - BALL_R * 0.6; }
+
+  // ── Zustand ──────────────────────────────────────────────────────────────
+  var S = null;
+  var rekord = 0;
+  try { rekord = parseInt(localStorage.getItem(SPEICHER), 10) || 0; } catch (e) { rekord = 0; }
+  var texte = [];
+  var tasten = {};
+  var zeigerAktiv = false;
+
+  function neuesSpiel(zustand) {
+    S = {
+      zustand: zustand,          // bereit | zielen | laden | flug | ergebnis | pause | ende
+      punkte: 0, tore: 0, runde: 1, serie: 0,
+      schuesse: [],              // je Schuss dieser Runde: true (Tor) / false
+      verlauf: [],               // Zonen der letzten Schüsse (-1 links, 0 Mitte, 1 rechts), der Torwart liest mit
+      ziel: { x: G.cx, y: G.y0 + G.h * 0.45 },
+      kraft: 0, ladeZeit: 0,
+      ball: null, torwart: null, warte: 0, wackeln: 0, netz: 0
+    };
+    torwartNeu();
+  }
+
+  function torwartNeu() {
+    S.torwart = { x: G.cx, y: G.y1 - 44, sx: G.cx, sy: G.y1 - 44, zx: G.cx, zy: G.y1 - 44, t: 0, dauer: 0.45, verz: 0.08, aktiv: false, kipp: 0, wipp: 0 };
+  }
+
+  // Torwart-Stärke je Runde
+  function staerke() {
+    var r = S.runde - 1;
+    return {
+      liest: Math.min(0.5, 0.12 + r * 0.035),      // erkennt den echten Schuss
+      merkt: Math.min(0.8, 0.3 + r * 0.05),        // tippt auf deine Lieblingsecke
+      genau: Math.min(0.75, 0.25 + r * 0.04),      // wie nah er an die Ballbahn kommt, wenn er richtig liegt
+      reichweite: Math.min(58, 33 + r * 2.5) * (G.b / 400),
+      dauer: Math.max(0.27, 0.45 - r * 0.015),
+      verz: Math.max(0.03, 0.1 - r * 0.012)
+    };
+  }
+
+  function zoneVon(x) {
+    var rel = (x - G.cx) / (G.b / 2);
+    return rel < -0.33 ? -1 : (rel > 0.33 ? 1 : 0);
+  }
+
+  // ── HUD und Tafel ────────────────────────────────────────────────────────
+  function hud() {
+    elScore.textContent = zahl(S.punkte);
+    elMeta.textContent = T.runde + ' ' + S.runde + (S.serie > 1 ? ' · ' + T.serie + ' ' + S.serie : '');
+    var s = '';
+    for (var i = 0; i < SCHUESSE; i++) s += i < S.schuesse.length ? (S.schuesse[i] ? '●' : '✕') : '○';
+    elSchuesse.textContent = s;
+    elBest.textContent = '';
+    elBest.appendChild(document.createTextNode(T.best));
+    var b = document.createElement('b');
+    b.textContent = zahl(Math.max(rekord, S.punkte));
+    elBest.appendChild(b);
+  }
+
+  function tafel(titel, text, knopf, mitErgebnis, neu) {
+    elTitel.hidden = !titel;
+    elTitel.textContent = titel || '';
+    elText.textContent = text || '';
+    elText.hidden = !text;
+    elErgebnis.hidden = !mitErgebnis;
+    elPanel.classList.toggle('neu', !!neu);
+    elKnopf.textContent = knopf;
+    elPanel.hidden = false;
+    try { elKnopf.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+  }
+
+  function bereit() {
+    neuesSpiel('bereit');
+    tafel('', touch ? T.touch : T.keys, T.start, false, false);
+    hud();
+  }
+
+  function start() {
+    neuesSpiel('zielen');
+    elPanel.hidden = true;
+    try { cv.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+    hud();
+  }
+
+  function ende() {
+    S.zustand = 'ende';
+    var neu = S.punkte > rekord;
+    if (neu) {
+      rekord = S.punkte;
+      try { localStorage.setItem(SPEICHER, String(rekord)); } catch (e) { /* ohne Speicher weiterspielen */ }
+    }
+    $('erPunkte').textContent = zahl(S.punkte);
+    $('erTore').textContent = zahl(S.tore);
+    $('erRunde').textContent = zahl(S.runde);
+    $('erBest').textContent = zahl(rekord);
+    var tore = S.schuesse.filter(Boolean).length;
+    tafel(neu ? T.rec : T.over, T.zuWenig.replace('{t}', tore), T.again, true, neu);
+    hud();
+  }
+
+  elKnopf.addEventListener('click', function () {
+    if (S.zustand === 'pause') { naechsteRunde(); return; }
+    start();
+  });
+
+  // ── Schuss ───────────────────────────────────────────────────────────────
+  function laden() {
+    if (S.zustand !== 'zielen') return;
+    S.zustand = 'laden';
+    S.ladeZeit = 0;
+    S.kraft = 0;
+  }
+
+  function schiessen() {
+    if (S.zustand !== 'laden') return;
+    var p = S.kraft;
+    var abw = Math.max(0, Math.abs(p - (IDEAL_VON + IDEAL_BIS) / 2) - (IDEAL_BIS - IDEAL_VON) / 2);
+    var streu = (5 + abw * 150) * (G.b / 400);
+    var tx = S.ziel.x + zufall(-streu, streu);
+    var ty = S.ziel.y + zufall(-streu, streu) * 0.7;
+    if (p > ZU_STARK) ty -= (p - ZU_STARK) * G.h * 4.5;          // zu viel Kraft: geht hoch
+    var flug = 0.95 - 0.5 * p;                                  // schwacher Schuss: langsam
+    S.ball = { t: 0, flug: flug, x0: punkt.x, y0: punkt.y, tx: tx, ty: ty, bogen: 30 + (1 - p) * 50, kraft: p, x: punkt.x, y: punkt.y, s: 1, dreh: 0, fertig: false };
+    S.zustand = 'flug';
+    torwartSpringt(tx, ty, p);
+    S.verlauf.push(zoneVon(S.ziel.x));
+    if (S.verlauf.length > 6) S.verlauf.shift();
+  }
+
+  function torwartSpringt(tx, ty, kraft) {
+    var st = staerke();
+    var echt = zoneVon(tx);
+    var zone;
+    // schwacher Schuss: Torwart sieht ihn kommen
+    if (Math.random() < st.liest + Math.max(0, 0.6 - kraft) * 1.2) {
+      zone = echt;
+    } else if (S.verlauf.length >= 2 && Math.random() < st.merkt) {
+      // häufigste Zone der letzten Schüsse
+      var n = { '-1': 0, '0': 0, '1': 0 };
+      S.verlauf.slice(-4).forEach(function (z) { n[z]++; });
+      var max = Math.max(n['-1'], n['0'], n['1']);
+      var top = [-1, 0, 1].filter(function (z) { return n[z] === max; });
+      zone = top[Math.floor(Math.random() * top.length)];
+    } else {
+      var w = Math.random();
+      zone = w < 0.35 ? -1 : (w < 0.65 ? 0 : 1);
+    }
+    var zx = G.cx + zone * G.b * 0.22 + zufall(-G.b * 0.05, G.b * 0.05);
+    var zy = zufall(G.y0 + G.h * 0.25, G.y1 - 30);
+    if (zone === echt) {
+      zx = lerp(zx, tx, st.genau);
+      zy = lerp(zy, ty, st.genau);
+    }
+    var k = S.torwart;
+    k.sx = k.x; k.sy = k.y;
+    k.zx = klemm(zx, G.x0 + 10, G.x1 - 10);
+    k.zy = klemm(zy, G.y0 + 16, G.y1 - 30);
+    k.t = 0;
+    k.dauer = st.dauer;
+    k.verz = st.verz;
+    k.aktiv = true;
+    k.reichweite = st.reichweite * (kraft < 0.6 ? 1 + (0.6 - kraft) * 3 : 1);   // schwacher Schuss: leichter zu halten
+  }
+
+  function torwartPos(zeit) {
+    var k = S.torwart;
+    var f = ease(klemm((zeit - k.verz) / k.dauer, 0, 1));
+    return { x: lerp(k.sx, k.zx, f), y: lerp(k.sy, k.zy, f), f: f };
+  }
+
+  function auswerten() {
+    var b = S.ball, k = S.torwart;
+    var ergebnis, farbeText = C.chalk;
+    var pos = torwartPos(b.flug);
+    var nahPfosten = Math.min(Math.abs(b.tx - G.x0), Math.abs(b.tx - G.x1));
+    var nahLatte = Math.abs(b.ty - G.y0);
+    var imTor = b.tx > G.x0 + PFOSTEN / 2 && b.tx < G.x1 - PFOSTEN / 2 && b.ty > G.y0 + PFOSTEN / 2 && b.ty < G.y1;
+    if ((nahPfosten < PFOSTEN / 2 + BALL_R * 0.55 && b.ty > G.y0 - BALL_R * 0.5 && b.ty < G.y1) ||
+        (nahLatte < PFOSTEN / 2 + BALL_R * 0.55 && b.tx > G.x0 - BALL_R * 0.5 && b.tx < G.x1 + BALL_R * 0.5)) {
+      ergebnis = 'pfosten';
+    } else if (!imTor) {
+      ergebnis = b.ty <= G.y0 ? 'drueber' : 'vorbei';
+    } else if (Math.hypot(b.tx - pos.x, b.ty - pos.y) < k.reichweite + BALL_R * 0.6) {
+      ergebnis = 'gehalten';
+    } else {
+      ergebnis = 'tor';
+    }
+
+    var tor = ergebnis === 'tor';
+    S.schuesse.push(tor);
+    if (tor) {
+      S.tore++;
+      S.serie++;
+      var ecke = Math.abs(b.tx - G.cx) / (G.b / 2);            // 0 Mitte … 1 Pfosten
+      var hoch = 1 - (b.ty - G.y0) / G.h;                      // 0 Boden … 1 Latte
+      var faktor = Math.min(3, 1 + (S.serie - 1) * 0.5);
+      var p = Math.round((100 + ecke * 100 + Math.max(0, hoch) * 50) * faktor);
+      S.punkte += p;
+      texte.push({ x: W / 2, y: G.y1 + 46, t: 0, d: 1.2, txt: T.tor, gross: true, farbe: C.gold });
+      texte.push({ x: W / 2, y: G.y1 + 74, t: 0, d: 1.2, txt: '+' + zahl(p) + (faktor > 1 ? '  ×' + String(faktor).replace('.', ',') : ''), farbe: C.chalk });
+      S.netz = 1;
+      b.ins = true;
+    } else {
+      S.serie = 0;
+      if (ergebnis === 'gehalten') { b.abpraller = { vx: (b.tx - pos.x) * 3 + zufall(-60, 60), vy: 220 }; S.wackeln = 0.15; }
+      if (ergebnis === 'pfosten') { b.abpraller = { vx: (b.tx < G.cx ? -1 : 1) * 160, vy: 180 }; S.wackeln = 0.2; }
+      if (ergebnis === 'drueber' || ergebnis === 'vorbei') b.weiter = true;
+      texte.push({ x: W / 2, y: G.y1 + 46, t: 0, d: 1.2, txt: T[ergebnis], gross: true, farbe: ergebnis === 'gehalten' ? C.chalk : C.rot });
+    }
+    if (navigator.vibrate) { try { navigator.vibrate(tor ? [20, 30, 20] : 40); } catch (e) { /* egal */ } }
+    S.zustand = 'ergebnis';
+    S.warte = 1.25;
+    hud();
+  }
+
+  function naechsterSchuss() {
+    if (S.schuesse.length < SCHUESSE) {
+      S.ball = null;
+      torwartNeu();
+      S.zustand = 'zielen';
+      return;
+    }
+    var tore = S.schuesse.filter(Boolean).length;
+    if (tore >= MINDEST_TORE) {
+      var perfekt = tore === SCHUESSE;
+      if (perfekt) S.punkte += PERFEKT_BONUS;
+      S.zustand = 'pause';
+      S.ball = null;
+      torwartNeu();
+      hud();
+      tafel(perfekt ? T.perfekt : T.rundeGeschafft, T.naechste.replace('{n}', S.runde + 1), T.weiter, false, perfekt);
+    } else {
+      ende();
+    }
+  }
+
+  function naechsteRunde() {
+    S.runde++;
+    S.schuesse = [];
+    S.ball = null;
+    torwartNeu();
+    S.zustand = 'zielen';
+    elPanel.hidden = true;
+    try { cv.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+    hud();
+  }
+
+  // ── Eingabe ──────────────────────────────────────────────────────────────
+  function zeigerZiel(e) {
+    var r = cv.getBoundingClientRect();
+    S.ziel.x = klemm(e.clientX - r.left, zielMinX(), zielMaxX());
+    // Touch: Finger deckt sonst das Ziel ab, darum etwas darüber zielen
+    S.ziel.y = klemm(e.clientY - r.top - (e.pointerType === 'touch' ? 28 : 0), zielMinY(), zielMaxY());
+  }
+  cv.addEventListener('pointerdown', function (e) {
+    if (S.zustand !== 'zielen') return;
+    e.preventDefault();
+    zeigerAktiv = true;
+    try { cv.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
+    zeigerZiel(e);
+    laden();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (S.zustand === 'laden' && zeigerAktiv) zeigerZiel(e);
+    else if (S.zustand === 'zielen' && e.pointerType === 'mouse') zeigerZiel(e);
+  });
+  function loslassen() {
+    if (!zeigerAktiv) return;
+    zeigerAktiv = false;
+    schiessen();
+  }
+  cv.addEventListener('pointerup', loslassen);
+  cv.addEventListener('pointercancel', function () { zeigerAktiv = false; if (S.zustand === 'laden') S.zustand = 'zielen'; });
+
+  var RICHTUNG = { ArrowLeft: 'l', ArrowRight: 'r', ArrowUp: 'o', ArrowDown: 'u', a: 'l', d: 'r', w: 'o', s: 'u', A: 'l', D: 'r', W: 'o', S: 'u' };
+  window.addEventListener('keydown', function (e) {
+    if (!elPanel.hidden) return;
+    if (RICHTUNG[e.key]) { tasten[RICHTUNG[e.key]] = true; e.preventDefault(); }
+    if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { laden(); e.preventDefault(); }
+  });
+  window.addEventListener('keyup', function (e) {
+    if (RICHTUNG[e.key]) tasten[RICHTUNG[e.key]] = false;
+    if (e.key === ' ' || e.key === 'Enter') { if (!zeigerAktiv) schiessen(); e.preventDefault(); }
+  });
+  window.addEventListener('blur', function () { tasten = {}; });
+
+  // ── Ablauf ───────────────────────────────────────────────────────────────
+  function schritt(dt) {
+    var k = S.torwart;
+    k.wipp += dt;
+    S.wackeln = Math.max(0, S.wackeln - dt);
+    S.netz = Math.max(0, S.netz - dt * 1.6);
+
+    if (S.zustand === 'zielen' || S.zustand === 'laden') {
+      var dx = (tasten.r ? 1 : 0) - (tasten.l ? 1 : 0);
+      var dy = (tasten.u ? 1 : 0) - (tasten.o ? 1 : 0);
+      if (dx || dy) {
+        S.ziel.x = klemm(S.ziel.x + dx * 240 * dt, zielMinX(), zielMaxX());
+        S.ziel.y = klemm(S.ziel.y + dy * 170 * dt, zielMinY(), zielMaxY());
+      }
+      // Torwart tänzelt auf der Linie
+      k.x = G.cx + Math.sin(k.wipp * 2.2) * G.b * 0.035;
+    }
+    if (S.zustand === 'laden') {
+      S.ladeZeit += dt;
+      var ph = (S.ladeZeit % KRAFT_ZYKLUS) / KRAFT_ZYKLUS;
+      S.kraft = ph < 0.5 ? ph * 2 : 2 - ph * 2;
+    }
+    if (S.zustand === 'flug') {
+      var b = S.ball;
+      b.t += dt;
+      var f = klemm(b.t / b.flug, 0, 1);
+      b.x = lerp(b.x0, b.tx, f);
+      b.y = lerp(b.y0, b.ty, f) - Math.sin(Math.PI * f) * b.bogen;
+      b.s = lerp(1, 0.5, f);
+      b.dreh += dt * 14;
+      var pos = torwartPos(b.t);
+      k.x = pos.x; k.y = pos.y; k.kipp = klemm((k.zx - k.sx) / (G.b * 0.3), -1, 1) * pos.f;
+      if (f >= 1) auswerten();
+    } else if (S.zustand === 'ergebnis') {
+      var bb = S.ball;
+      if (bb.abpraller) {
+        bb.x += bb.abpraller.vx * dt; bb.y += bb.abpraller.vy * dt; bb.abpraller.vy += 300 * dt; bb.dreh += dt * 8;
+      } else if (bb.weiter) {
+        bb.y -= 140 * dt; bb.s = Math.max(0.3, bb.s - dt * 0.4); bb.dreh += dt * 10;
+      } else if (bb.ins) {
+        bb.s = Math.max(0.42, bb.s - dt * 0.3);
+      }
+      S.warte -= dt;
+      if (S.warte <= 0) naechsterSchuss();
+    }
+
+    for (var n = texte.length - 1; n >= 0; n--) { texte[n].t += dt; if (texte[n].t > texte[n].d) texte.splice(n, 1); }
+  }
+
+  // ── Zeichnen ─────────────────────────────────────────────────────────────
+  function feld() {
+    // Tribüne
+    ctx.fillStyle = C.tribuene;
+    ctx.fillRect(0, 0, W, G.y1 - 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    for (var r = 0; r < 6; r++) ctx.fillRect(0, 10 + r * 12, W, 5);
+    // Rasen mit Streifen
+    var y = G.y1 - 4;
+    for (var i = 0; y < H; i++) {
+      var h = 18 + i * 7;
+      ctx.fillStyle = i % 2 ? C.pitch2 : C.pitch;
+      ctx.fillRect(0, y, W, h);
+      y += h;
+    }
+    // Strafraum (leicht perspektivisch)
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, G.y1); ctx.lineTo(W, G.y1);                       // Torlinie
+    var t5 = G.b * 0.62;
+    ctx.moveTo(G.cx - t5, G.y1); ctx.lineTo(G.cx - t5 - 14, G.y1 + 34); ctx.lineTo(G.cx + t5 + 14, G.y1 + 34); ctx.lineTo(G.cx + t5, G.y1);
+    var t16 = G.b * 1.25;
+    ctx.moveTo(G.cx - t16, G.y1); ctx.lineTo(G.cx - t16 - 40, H - 22); ctx.moveTo(G.cx + t16, G.y1); ctx.lineTo(G.cx + t16 + 40, H - 22);
+    ctx.moveTo(G.cx - t16 - 40, H - 22); ctx.lineTo(G.cx + t16 + 40, H - 22);
+    ctx.stroke();
+    // Elfmeterpunkt
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.beginPath(); ctx.ellipse(punkt.x, punkt.y + BALL_R * 0.8, 5, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function tor() {
+    // Netz (beult bei Tor nach hinten aus)
+    var beule = S.netz * 10;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+    ctx.lineWidth = 1;
+    var tief = 14;
+    ctx.beginPath();
+    for (var x = G.x0; x <= G.x1 + 0.5; x += 12) {
+      ctx.moveTo(x, G.y0); ctx.lineTo(lerp(x, G.cx, 0.04) , G.y1 - tief + Math.sin((x - G.x0) / G.b * Math.PI) * beule);
+    }
+    for (var y = G.y0; y <= G.y1 - tief + 0.5; y += 12) {
+      ctx.moveTo(G.x0, y);
+      ctx.quadraticCurveTo(G.cx, y - beule * 0.6, G.x1, y);
+    }
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(0,0,0,0.12)';
+    ctx.fillRect(G.x0, G.y1 - tief, G.b, tief);
+    ctx.restore();
+  }
+
+  function pfosten() {
+    ctx.fillStyle = C.chalk;
+    ctx.shadowColor = 'rgba(0,0,0,0.25)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 1;
+    ctx.fillRect(G.x0 - PFOSTEN / 2, G.y0 - PFOSTEN / 2, PFOSTEN, G.h + PFOSTEN / 2);
+    ctx.fillRect(G.x1 - PFOSTEN / 2, G.y0 - PFOSTEN / 2, PFOSTEN, G.h + PFOSTEN / 2);
+    ctx.fillRect(G.x0 - PFOSTEN / 2, G.y0 - PFOSTEN / 2, G.b + PFOSTEN, PFOSTEN);
+    ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  }
+
+  function torwart() {
+    var k = S.torwart;
+    var m = G.h / 133;                                   // Größe passend zum Tor
+    ctx.save();
+    ctx.translate(k.x, k.y);
+    ctx.rotate(k.kipp * 1.25);
+    ctx.scale(m, m);
+    // Beine
+    ctx.fillStyle = C.torwartHose;
+    ctx.fillRect(-12, 14, 10, 30); ctx.fillRect(2, 14, 10, 30);
+    ctx.fillStyle = C.ink;
+    ctx.fillRect(-13, 42, 12, 5); ctx.fillRect(1, 42, 12, 5);
+    // Arme (beim Hechten gestreckt)
+    var arm = k.aktiv ? -1 : -0.55;
+    ctx.strokeStyle = C.torwart; ctx.lineWidth = 8; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-14, -14); ctx.lineTo(-14 - 16, -14 + arm * 22);
+    ctx.moveTo(14, -14); ctx.lineTo(14 + 16, -14 + arm * 22);
+    ctx.stroke();
+    ctx.fillStyle = C.chalk;                             // Handschuhe
+    ctx.beginPath(); ctx.arc(-30, -14 + arm * 22 - 3, 6, 0, Math.PI * 2); ctx.arc(30, -14 + arm * 22 - 3, 6, 0, Math.PI * 2); ctx.fill();
+    // Körper
+    ctx.fillStyle = C.torwart;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-16, -20, 32, 38, 8); else ctx.rect(-16, -20, 32, 38);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(-16, 4, 32, 3);
+    ctx.fillStyle = C.torwartHose;
+    ctx.fillRect(-15, 12, 30, 7);
+    // Kopf
+    ctx.fillStyle = C.haut;
+    ctx.beginPath(); ctx.arc(0, -30, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = C.haare;
+    ctx.beginPath(); ctx.arc(0, -33, 10, Math.PI, 0); ctx.fill();
+    ctx.restore();
+  }
+
+  function ball(x, y, s, dreh) {
+    var r = BALL_R * s;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.beginPath(); ctx.ellipse(x, y + r * 0.95, r * 0.9, r * 0.32, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.translate(x, y);
+    ctx.rotate(dreh);
+    ctx.fillStyle = C.chalk;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = C.ink;
+    ctx.beginPath();
+    for (var i = 0; i < 5; i++) { var a = -Math.PI / 2 + i * 2 * Math.PI / 5; ctx.lineTo(Math.cos(a) * r * 0.38, Math.sin(a) * r * 0.38); }
+    ctx.closePath(); ctx.fill();
+    for (var j = 0; j < 5; j++) {
+      var a2 = -Math.PI / 2 + j * 2 * Math.PI / 5;
+      ctx.beginPath(); ctx.arc(Math.cos(a2) * r * 0.95, Math.sin(a2) * r * 0.95, r * 0.28, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  function zielkreuz() {
+    var x = S.ziel.x, y = S.ziel.y;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 3;
+    ctx.beginPath(); ctx.arc(x, y, 11, 0, Math.PI * 2);
+    ctx.moveTo(x - 17, y); ctx.lineTo(x - 6, y); ctx.moveTo(x + 6, y); ctx.lineTo(x + 17, y);
+    ctx.moveTo(x, y - 17); ctx.lineTo(x, y - 6); ctx.moveTo(x, y + 6); ctx.lineTo(x, y + 17);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function kraftbalken() {
+    var bw = Math.min(200, W * 0.5), bh = 12, bx = W / 2 - bw / 2, by = H - 34;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx - 3, by - 3, bw + 6, bh + 6, 9); else ctx.rect(bx - 3, by - 3, bw + 6, bh + 6); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(bx, by, bw, bh);
+    ctx.fillStyle = 'rgba(87,211,122,0.55)';
+    ctx.fillRect(bx + bw * IDEAL_VON, by, bw * (IDEAL_BIS - IDEAL_VON), bh);
+    ctx.fillStyle = 'rgba(229,83,75,0.55)';
+    ctx.fillRect(bx + bw * ZU_STARK, by, bw * (1 - ZU_STARK), bh);
+    if (S.zustand === 'laden') {
+      var k = S.kraft;
+      ctx.fillStyle = k >= IDEAL_VON && k <= IDEAL_BIS ? C.gruen : (k > ZU_STARK ? C.rot : C.chalk);
+      ctx.fillRect(bx, by, bw * k, bh);
+      ctx.fillStyle = C.chalk;
+      ctx.fillRect(bx + bw * k - 1.5, by - 4, 3, bh + 8);
+    }
+    ctx.restore();
+  }
+
+  function zeichnen() {
+    ctx.save();
+    if (S.wackeln > 0) ctx.translate(zufall(-3, 3), zufall(-3, 3));
+    feld();
+    tor();
+    var b = S.ball;
+    var hinterTorwart = b && (b.ins || (S.zustand === 'flug' && b.t / b.flug > 0.85));
+    if (b && hinterTorwart) ball(b.x, b.y, b.s, b.dreh);
+    torwart();
+    pfosten();
+    if (b && !hinterTorwart) ball(b.x, b.y, b.s, b.dreh);
+    if (!b) ball(punkt.x, punkt.y, 1, 0);
+    if (S.zustand === 'zielen' || S.zustand === 'laden') { zielkreuz(); kraftbalken(); }
+
+    ctx.textAlign = 'center';
+    for (var n = 0; n < texte.length; n++) {
+      var t = texte[n];
+      var a = t.t / t.d;
+      ctx.globalAlpha = a < 0.7 ? 1 : 1 - (a - 0.7) / 0.3;
+      ctx.font = (t.gross ? '900 34px ' : '800 17px ') + FONT;
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillText(t.txt, t.x + 1, t.y - t.t * 10 + 2);
+      ctx.fillStyle = t.farbe || C.chalk;
+      ctx.fillText(t.txt, t.x, t.y - t.t * 10);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  var zuletzt = performance.now();
+  function schleife(jetzt) {
+    var dt = Math.min(0.05, (jetzt - zuletzt) / 1000);
+    zuletzt = jetzt;
+    schritt(dt);
+    zeichnen();
+    requestAnimationFrame(schleife);
+  }
+
+  window.addEventListener('resize', groesse);
+  groesse();
+  bereit();
+  groesse();
+  requestAnimationFrame(schleife);
+})();
+</script>
+</body>
+</html>
